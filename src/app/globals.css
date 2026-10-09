@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens — portados do SPA original (sac-progestao-demo.html)
+   Tema padrão: escuro. Tema claro via [data-theme="light"].
+   ========================================================================== */
+:root {
+  --bg0: #0a0e16;
+  --bg1: #10141d;
+  --bg2: #161b26;
+  --bg3: #1c212e;
+  --bg4: #252b3a;
+  --bg5: #323a4c;
+
+  --acc: #1a56c4;
+  --acc2: #4d85e0;
+  --acc3: rgba(26, 86, 196, 0.14);
+
+  --grn: #1c8a43;
+  --grn2: #3fae63;
+  --grn3: rgba(28, 138, 67, 0.13);
+
+  --amb: #b6700a;
+  --amb2: #e0a030;
+  --amb3: rgba(182, 112, 10, 0.14);
+
+  --red: #b82c2c;
+  --red2: #e05858;
+  --red3: rgba(184, 44, 44, 0.13);
+
+  --prp: #3b4a63;
+  --prp2: #8b9dc0;
+  --prp3: rgba(59, 74, 99, 0.16);
+
+  --org: #c45b1a;
+  --org2: #e07838;
+  --org3: rgba(196, 91, 26, 0.14);
+
+  --t1: #edeff3;
+  --t2: #9aa3b4;
+  --t3: #6b7488;
+  --t4: #454c5c;
+
+  --brd: rgba(255, 255, 255, 0.08);
+  --brd2: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] {
+  --bg0: #f2f4f7;
+  --bg1: #ffffff;
+  --bg2: #f6f7f9;
+  --bg3: #eceef2;
+  --bg4: #e0e3e9;
+
+  --t1: #171b26;
+  --t2: #4a5266;
+  --t3: #8890a0;
+
+  --brd: rgba(15, 23, 42, 0.09);
+  --brd2: rgba(15, 23, 42, 0.16);
+
+  --acc3: rgba(26, 86, 196, 0.07);
+  --grn3: rgba(28, 138, 67, 0.08);
+  --amb3: rgba(182, 112, 10, 0.08);
+  --red3: rgba(184, 44, 44, 0.08);
+}
+
+/* Mapeia os tokens para utilitários Tailwind (bg-bg1, text-t2, border-brd…) */
+@theme inline {
+  --color-bg0: var(--bg0);
+  --color-bg1: var(--bg1);
+  --color-bg2: var(--bg2);
+  --color-bg3: var(--bg3);
+  --color-bg4: var(--bg4);
+  --color-bg5: var(--bg5);
+
+  --color-acc: var(--acc);
+  --color-acc2: var(--acc2);
+  --color-acc3: var(--acc3);
+
+  --color-grn: var(--grn);
+  --color-grn2: var(--grn2);
+  --color-grn3: var(--grn3);
+
+  --color-amb: var(--amb);
+  --color-amb2: var(--amb2);
+  --color-amb3: var(--amb3);
+
+  --color-red: var(--red);
+  --color-red2: var(--red2);
+  --color-red3: var(--red3);
+
+  --color-prp: var(--prp);
+  --color-prp2: var(--prp2);
+  --color-prp3: var(--prp3);
+
+  --color-org: var(--org);
+  --color-org2: var(--org2);
+  --color-org3: var(--org3);
+
+  --color-t1: var(--t1);
+  --color-t2: var(--t2);
+  --color-t3: var(--t3);
+  --color-t4: var(--t4);
+
+  --color-brd: var(--brd);
+  --color-brd2: var(--brd2);
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg0);
+    color: var(--t1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.25s;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--brd) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--brd);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--brd2);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.18s ease;
+}
