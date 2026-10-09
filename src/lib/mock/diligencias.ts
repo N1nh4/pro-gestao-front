@@ -88,3 +88,13 @@ export const DIL_ST_LABEL: Record<DiligenciaStatus, string> = {
 export function contarDiligenciasVencidas(): number {
   return DILIGENCIAS.filter((d) => d.status === "vencida").length;
 }
+
+/** Considera "aberta" toda diligência que ainda não foi resolvida. */
+export function isDiligenciaAberta(d: Diligencia): boolean {
+  return d.status !== "aprovada" && d.status !== "remitida";
+}
+
+/** Há diligência aberta vinculada a alguma das ações informadas? */
+export function temDiligenciaAberta(idsAcao: string[]): boolean {
+  return DILIGENCIAS.some((d) => idsAcao.includes(d.acaoCod) && isDiligenciaAberta(d));
+}
