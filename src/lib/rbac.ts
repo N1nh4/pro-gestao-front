@@ -18,6 +18,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
       "painel",
       "progestao",
       "plano",
+      "diligencias",
       "certificacao",
       "bi",
       "documentos",
@@ -32,7 +33,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Admin do Ente",
     badgeClass: "bg-acc3 text-acc2",
     setor: "TODOS",
-    nav: ["painel", "progestao", "plano", "certificacao", "bi", "documentos", "config"],
+    nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "bi", "documentos", "config"],
     cfgTabs: ["ente", "unidades", "certificacoes", "usuarios"],
   },
   op: {
@@ -42,7 +43,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Operacional",
     badgeClass: "bg-amb3 text-amb2",
     setor: "GEFIN",
-    nav: ["painel", "progestao", "plano", "documentos"],
+    nav: ["painel", "progestao", "plano", "diligencias", "documentos"],
     cfgTabs: [],
   },
   lv: {
@@ -52,7 +53,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Leitura",
     badgeClass: "bg-bg3 text-t3",
     setor: null,
-    nav: ["painel", "progestao", "certificacao", "bi", "documentos"],
+    nav: ["painel", "progestao", "diligencias", "certificacao", "bi", "documentos"],
     cfgTabs: [],
   },
 };
