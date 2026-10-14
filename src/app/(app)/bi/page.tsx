@@ -51,8 +51,7 @@ export default function BiPage() {
                   {
                     data: DADOS_PLANO.data,
                     backgroundColor: DADOS_PLANO.colors.map((c) => c.bg),
-                    borderColor: "var(--bg1)",
-                    borderWidth: 2,
+                    borderWidth: 0,
                   },
                 ],
               }}
