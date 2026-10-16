@@ -23,6 +23,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
       "bi",
       "documentos",
       "config",
+      "parametros",
     ],
     cfgTabs: ["manuais", "perfis", "ente", "unidades", "certificacoes", "usuarios", "trilha"],
   },
@@ -33,7 +34,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Admin do Ente",
     badgeClass: "bg-acc3 text-acc2",
     setor: "TODOS",
-    nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "bi", "documentos", "config"],
+    nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "bi", "documentos", "config", "parametros"],
     cfgTabs: ["ente", "unidades", "certificacoes", "usuarios"],
   },
   op: {
@@ -68,6 +69,7 @@ export const NAV_ORDER: NavId[] = [
   "bi",
   "documentos",
   "config",
+  "parametros",
 ];
 
 export const NAV_DEF: Record<NavId, NavDef> = {
@@ -79,6 +81,7 @@ export const NAV_DEF: Record<NavId, NavDef> = {
   bi: { label: "Painel Analítico", icon: "bar-chart-3" },
   documentos: { label: "Doc. Modelos", icon: "file-text" },
   config: { label: "Configurações", icon: "settings" },
+  parametros: { label: "Parâmetros", icon: "sliders-horizontal" },
 };
 
 /** Títulos usados na topbar (inclui telas ainda não migradas). */
@@ -91,6 +94,7 @@ export const TITLES: Record<string, string> = {
   bi: "Painel Analítico (BI)",
   documentos: "Documentos Modelos",
   config: "Configurações",
+  parametros: "Parâmetros",
 };
 
 /** Rótulo do botão de ação primária por tela. */

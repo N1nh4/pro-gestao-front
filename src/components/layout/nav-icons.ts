@@ -6,6 +6,7 @@ import {
   MessagesSquare,
   Settings,
   ShieldCheck,
+  SlidersHorizontal,
   Stethoscope,
   type LucideIcon,
 } from "lucide-react";
@@ -20,4 +21,5 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   "bar-chart-3": ChartColumn,
   "file-text": FileText,
   settings: Settings,
+  "sliders-horizontal": SlidersHorizontal,
 };

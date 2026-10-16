@@ -10,7 +10,8 @@ export type NavId =
   | "certificacao"
   | "bi"
   | "documentos"
-  | "config";
+  | "config"
+  | "parametros";
 
 export interface Perfil {
   id: PerfilId;
