@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
+import { runPrimaryAction } from "@/lib/primaryAction";
 import { useNotifications } from "./notifications";
 import { cn } from "@/lib/cn";
 
@@ -116,7 +117,9 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
         <Button
           variant="pri"
           icon={<Plus className="size-3.5" />}
-          onClick={() => toast(`${primaryLabel} — em breve.`, "info")}
+          onClick={() => {
+            if (!runPrimaryAction()) toast(`${primaryLabel} — em breve.`, "info");
+          }}
         >
           {primaryLabel}
         </Button>

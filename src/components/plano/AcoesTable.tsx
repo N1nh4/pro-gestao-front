@@ -1,11 +1,9 @@
 "use client";
 
-import { type AcaoPlano } from "@/lib/mock/plano";
-import { type AcaoPlano as AcaoPlanoOld } from "@/lib/mock/acoes";
-import { unidadeById } from "@/lib/mock/unidades";
-import { DILIGENCIAS, DIL_ST_LABEL } from "@/lib/mock/diligencias";
+import { type AcaoPlano } from "@/lib/domain/plano";
+import { DIL_ST_LABEL, type Diligencia } from "@/lib/domain/diligencias";
 
-type A = AcaoPlano | AcaoPlanoOld;
+type A = AcaoPlano;
 
 const STATUS_COR: Record<string, { bg: string; txt: string }> = {
   PENDENTE: { bg: "bg-bg3", txt: "text-t3" },
@@ -35,10 +33,12 @@ export function AcoesTable({
   acoes,
   isOp,
   unidadeAtual,
+  diligencias = [],
 }: {
   acoes: A[];
   isOp: boolean;
   unidadeAtual: string | null;
+  diligencias?: Diligencia[];
 }) {
   // filtro por unidade p/ op já deve vir feito na página; mantém simples
   const data = isOp && unidadeAtual ? acoes.filter((a) => a.unidadeId === unidadeAtual) : acoes;
@@ -57,10 +57,9 @@ export function AcoesTable({
         <div />
       </div>
       {data.map((a) => {
-        const un = unidadeById(a.unidadeId);
         const st = STATUS_COR[a.status] || STATUS_COR.PENDENTE;
         const venc = isVencida(a);
-        const dil = DILIGENCIAS.filter((d) => a.diligs.includes(d.num) || a.diligs.includes(`D-${d.num}`));
+        const dil = diligencias.filter((d) => a.diligs.includes(d.num) || a.diligs.includes(`D-${d.num}`));
         return (
           <div key={a.idAcao} className="border-t border-brd">
             <div className="grid grid-cols-[70px_70px_120px_1fr_80px_110px_80px_90px_70px] items-center gap-0 px-3 py-2">
@@ -68,7 +67,7 @@ export function AcoesTable({
               <div className="font-mono text-[9px] text-t3">{a.req}</div>
               <div className="truncate text-[10px] font-semibold text-t2">{a.item}</div>
               <div className="truncate pr-2 text-[10px] text-t1">{a.acao}</div>
-              <div className="text-[9px] font-semibold text-t2">{un?.sigla || a.setor}</div>
+              <div className="text-[9px] font-semibold text-t2">{a.setor}</div>
               <div>
                 <span className={`rounded px-2 py-0.5 text-[9px] font-bold ${st.bg} ${st.txt}`}>{a.status}</span>
               </div>

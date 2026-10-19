@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useSyncExternalStore, type ReactNode } from "react";
-import { autenticar, getPerfil } from "@/lib/rbac";
+import { loginApi } from "@/lib/api/auth";
+import { ApiError, clearToken, setToken } from "@/lib/api/client";
+import { autenticar, getPerfil, perfilIdFromNomes } from "@/lib/rbac";
 import { sessionStore, useMounted } from "@/lib/stores";
 import type { Perfil, PerfilId, SessionUser } from "@/lib/types";
 
@@ -31,15 +33,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const login = useCallback(async (email: string, senha: string): Promise<LoginResult> => {
-    // Simula latência de autenticação (mock).
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    const perfil = autenticar(email, senha);
-    if (!perfil) return { ok: false, erro: "Usuário ou senha inválidos." };
-    sessionStore.set({ perfil: perfil.id, nome: perfil.nome, email: perfil.email });
-    return { ok: true, perfil: perfil.id };
+    // 1) Tenta autenticar na API.
+    try {
+      const resp = await loginApi(email, senha);
+      setToken(resp.access_token);
+      const perfilId = perfilIdFromNomes(resp.perfis);
+      sessionStore.set({ perfil: perfilId, nome: resp.nome, email: resp.email });
+      return { ok: true, perfil: perfilId };
+    } catch (err) {
+      // 401 = credenciais inválidas na API (sem fallback).
+      if (err instanceof ApiError && err.status === 401) {
+        return { ok: false, erro: "Usuário ou senha inválidos." };
+      }
+      // API indisponível (rede/servidor) → fallback para o mock local.
+      clearToken();
+      const perfil = autenticar(email, senha);
+      if (!perfil) return { ok: false, erro: "Usuário ou senha inválidos." };
+      sessionStore.set({ perfil: perfil.id, nome: perfil.nome, email: perfil.email });
+      return { ok: true, perfil: perfil.id };
+    }
   }, []);
 
-  const logout = useCallback(() => sessionStore.set(null), []);
+  const logout = useCallback(() => {
+    clearToken();
+    sessionStore.set(null);
+  }, []);
 
   const perfil = user ? getPerfil(user.perfil) : null;
 

@@ -19,7 +19,7 @@ import {
   DIL_ST_LABEL,
   DIL_ST_TONE,
   type Diligencia,
-} from "@/lib/mock/diligencias";
+} from "@/lib/domain/diligencias";
 
 interface Props {
   d: Diligencia;

@@ -24,32 +24,7 @@ export interface Requisito {
   ess?: boolean;
 }
 
-export const REQUISITOS: Requisito[] = [
-  { cod: "3.1.1", dim: "CI", desc: "Mapeamento das Atividades das Áreas de Atuação do RPPS", resp: "GEPRE / UCGR", st: "parcial", evid: 6, aud: "22/11/2024" },
-  { cod: "3.1.2", dim: "CI", desc: "Manualização das Atividades das Áreas de Atuação do RPPS", resp: "GEPRE / UCGR", st: "parcial", evid: 6, aud: "22/11/2024" },
-  { cod: "3.1.3", dim: "CI", desc: "Certificação dos Dirigentes e Membros dos Conselhos", resp: "GAB DPR", st: "parcial", evid: 3, aud: "22/11/2024" },
-  { cod: "3.1.4", dim: "CI", desc: "Estrutura de Controle Interno", resp: "GECOP", st: "nao", evid: 2, aud: "22/11/2024" },
-  { cod: "3.1.5", dim: "CI", desc: "Política de Segurança da Informação", resp: "GEINP", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.1.6", dim: "CI", desc: "Gestão da Base de Dados Cadastrais", resp: "GEINP", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.2.1", dim: "GC", desc: "Relatório de Governança Corporativa", resp: "GEINP", st: "atendido", evid: 7, aud: "22/11/2024" },
-  { cod: "3.2.2", dim: "GC", desc: "Planejamento", resp: "DIR. EXEC.", st: "nao", evid: 1, aud: "22/11/2024" },
-  { cod: "3.2.3", dim: "GC", desc: "Relatório de Gestão Atuarial", resp: "DPR", st: "parcial", evid: 3, aud: "22/11/2024" },
-  { cod: "3.2.4", dim: "GC", desc: "Código de Ética e Conduta", resp: "OUVIDORIA", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.2.5", dim: "GC", desc: "Gestão de Pessoas", resp: "GEINP/DGP", st: "parcial", evid: 4, aud: "22/11/2024" },
-  { cod: "3.2.6", dim: "GC", desc: "Política de Investimentos", resp: "UCGR", st: "parcial", evid: 3, aud: "22/11/2024" },
-  { cod: "3.2.7", dim: "GC", desc: "Comitê de Investimentos", resp: "DPR", st: "parcial", evid: 3, aud: "22/11/2024" },
-  { cod: "3.2.8", dim: "GC", desc: "Transparência", resp: "GEINP", st: "nao", evid: 15, aud: "22/11/2024" },
-  { cod: "3.2.9", dim: "GC", desc: "Avaliação dos Controles Internos", resp: "GEINP/DPR", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.2.10", dim: "GC", desc: "Segregação das Atividades", resp: "GEPRE/UCGR/GEFIN", st: "atendido", evid: 2, aud: "22/11/2024" },
-  { cod: "3.2.11", dim: "GC", desc: "Ouvidoria", resp: "OUVIDORIA", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.2.12", dim: "GC", desc: "Gestão de Riscos", resp: "DIR. EXEC.", st: "parcial", evid: 3, aud: "22/11/2024" },
-  { cod: "3.2.13", dim: "GC", desc: "Conselho Fiscal", resp: "DPR/ASSGER", st: "parcial", evid: 4, aud: "22/11/2024" },
-  { cod: "3.2.14", dim: "GC", desc: "Conselho Deliberativo", resp: "DPR/ASSGER", st: "parcial", evid: 4, aud: "22/11/2024" },
-  { cod: "3.2.15", dim: "GC", desc: "Mandato e Representação", resp: "DPR/GEINP", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.2.16", dim: "GC", desc: "Avaliação dos Agentes de Investimento", resp: "DPR/GEINP", st: "parcial", evid: 2, aud: "22/11/2024" },
-  { cod: "3.3.1", dim: "EP", desc: "Plano de Ação de Capacitação", resp: "GEPRE/GECOP", st: "parcial", evid: 3, aud: "22/11/2024" },
-  { cod: "3.3.2", dim: "EP", desc: "Ações de Diálogo com os Segurados", resp: "DPR/GEPRE", st: "parcial", evid: 3, aud: "22/11/2024" },
-];
+export const REQUISITOS: Requisito[] = [];
 
 export type NivelPG = "I" | "II" | "III" | "IV";
 

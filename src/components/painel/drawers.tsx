@@ -7,10 +7,10 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import {
   DIL_ST_LABEL,
-  DILIGENCIAS,
   contarDiligenciasVencidas,
+  type Diligencia,
   type DiligenciaStatus,
-} from "@/lib/mock/diligencias";
+} from "@/lib/domain/diligencias";
 import { cn } from "@/lib/cn";
 
 const DOCS_VENCIDOS: { nome: string; cod: string; resp: string; emitido: string; val: string; status: "BREVE" | "VENCIDO" }[] = [
@@ -115,10 +115,10 @@ function DocsVencidosBody() {
   );
 }
 
-function DiligListBody({ onOpen }: { onOpen: () => void }) {
+function DiligListBody({ diligencias, onOpen }: { diligencias: Diligencia[]; onOpen: () => void }) {
   return (
     <div className="flex flex-col gap-2">
-      {DILIGENCIAS.map((d) => {
+      {diligencias.map((d) => {
         const vencida = d.status === "vencida";
         return (
           <button
@@ -150,7 +150,7 @@ function DiligListBody({ onOpen }: { onOpen: () => void }) {
 }
 
 /** Abre os drawers do Painel Executivo. */
-export function usePainelDrawers() {
+export function usePainelDrawers(diligencias: Diligencia[] = []) {
   const { openDrawer, closeDrawer } = useDrawer();
   const router = useRouter();
 
@@ -189,19 +189,21 @@ export function usePainelDrawers() {
     [openDrawer],
   );
 
+  const vencidas = contarDiligenciasVencidas(diligencias);
+
   const verDiligencias = useCallback(
     () =>
       openDrawer({
         title: "Diligências",
-        sub: `${contarDiligenciasVencidas()} vencida(s) · ${DILIGENCIAS.length - contarDiligenciasVencidas()} em andamento`,
-        body: <DiligListBody onOpen={abrirPlano} />,
+        sub: `${vencidas} vencida(s) · ${diligencias.length - vencidas} em andamento`,
+        body: <DiligListBody diligencias={diligencias} onOpen={abrirPlano} />,
         footer: (
           <Button variant="pri" onClick={abrirPlano}>
             Abrir Plano de Ação
           </Button>
         ),
       }),
-    [openDrawer, abrirPlano],
+    [openDrawer, abrirPlano, diligencias, vencidas],
   );
 
   return { verCertAtual, verCertPret, verDocsVencidos, verDiligencias };

@@ -12,13 +12,14 @@ import { cn } from "@/lib/cn";
 import {
   CRIT_LABEL,
   CRIT_TONE,
-  DILIGENCIAS,
   DIL_ST_LABEL,
   DIL_ST_TONE,
   type Criticidade,
   type Diligencia,
   type DiligenciaStatus,
-} from "@/lib/mock/diligencias";
+} from "@/lib/domain/diligencias";
+import { aprovarDiligencia, enviarRetorno, listarDiligencias } from "@/lib/api/diligencias";
+import { useApiResource } from "@/lib/useApiResource";
 import { CalendarClock, MessageSquare } from "lucide-react";
 
 const CYCLE_END = new Date("2026-07-31");
@@ -44,7 +45,11 @@ export default function DiligenciasPage() {
   const { openDrawer, closeDrawer } = useDrawer();
   const { toast } = useToast();
 
-  const [items, setItems] = useState<Diligencia[]>(DILIGENCIAS);
+  const { data: items, offline, setData, reload } = useApiResource<Diligencia[]>(
+    "diligencias",
+    listarDiligencias,
+    [],
+  );
   const [st, setSt] = useState<DiligenciaStatus | "">("");
   const [crit, setCrit] = useState<Criticidade | "">("");
 
@@ -78,7 +83,8 @@ export default function DiligenciasPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
-    setItems((prev) =>
+    const alvo = items.find((d) => d.num === num);
+    setData((prev) =>
       prev.map((d) =>
         d.num === num
           ? {
@@ -93,10 +99,16 @@ export default function DiligenciasPage() {
     );
     closeDrawer();
     toast(`Correção da D-${num} enviada. Aguardando análise do Auditor.`, "ok");
+    if (alvo?.apiId) {
+      enviarRetorno(alvo.apiId, texto)
+        .then(() => reload())
+        .catch(() => toast("API offline — correção aplicada localmente.", "warn"));
+    }
   }
 
   function aprovar(num: string) {
-    setItems((prev) =>
+    const alvo = items.find((d) => d.num === num);
+    setData((prev) =>
       prev.map((d) =>
         d.num === num
           ? { ...d, status: "aprovada", hist: [...d.hist, { dt: "hoje", ev: "Retorno aprovado pelo Auditor", user: perfil?.nome }] }
@@ -105,12 +117,17 @@ export default function DiligenciasPage() {
     );
     closeDrawer();
     toast(`D-${num} aprovada e concluída.`, "ok");
+    if (alvo?.apiId) {
+      aprovarDiligencia(alvo.apiId)
+        .then(() => reload())
+        .catch(() => toast("API offline — aprovação aplicada localmente.", "warn"));
+    }
   }
 
   function remitir(num: string) {
     const obs = window.prompt("Nova observação para remitir a diligência:");
     if (!obs) return;
-    setItems((prev) =>
+    setData((prev) =>
       prev.map((d) =>
         d.num === num
           ? {
@@ -147,6 +164,12 @@ export default function DiligenciasPage() {
 
   return (
     <div className="animate-fade-in">
+      {offline ? (
+        <Alert variant="warn" title="API indisponível — exibindo dados locais" className="mb-2">
+          Não foi possível conectar à API. As diligências são exibidas do repositório local.
+        </Alert>
+      ) : null}
+
       <Alert
         variant="info"
         title={isOp ? "Responda as diligências da sua unidade" : "Diligências — Acompanhamento das pendências de auditoria"}

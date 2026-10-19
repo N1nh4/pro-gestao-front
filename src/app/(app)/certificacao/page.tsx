@@ -6,16 +6,18 @@ import { Alert } from "@/components/ui/Alert";
 import { Kpi } from "@/components/ui/Kpi";
 import { Button } from "@/components/ui/Button";
 import { useDrawer } from "@/context/DrawerContext";
-import { useToast } from "@/context/ToastContext";
-import { cn } from "@/lib/cn";
+import { useToast } from "@/context/ToastContext";import { cn } from "@/lib/cn";
 import {
-  AUDITORIAS,
   CONC_TONE_BG,
   CONC_TONE_TX,
   TIPO_COR,
-  ultimaAuditoria,
+  montarAuditoria,
   type Auditoria,
-} from "@/lib/mock/auditorias";
+  type NovaAuditoriaInput,
+} from "@/lib/domain/auditorias";
+import { RegistrarAuditoriaModal } from "@/components/certificacao/RegistrarAuditoriaModal";
+import { criarAuditoria, listarAuditorias } from "@/lib/api/certificacoes";
+import { useApiResource } from "@/lib/useApiResource";
 import { Award, CalendarDays, ListChecks, ShieldCheck, UserCheck } from "lucide-react";
 
 function formatData(d: string) {
@@ -43,25 +45,30 @@ export default function CertificacaoPage() {
   const { openDrawer } = useDrawer();
   const { toast } = useToast();
 
-  const [lista] = useState<Auditoria[]>([...AUDITORIAS].sort((a, b) => (a.data < b.data ? 1 : -1)));
+  const { data: lista, offline, setData, reload } = useApiResource<Auditoria[]>(
+    "auditorias",
+    listarAuditorias,
+    [],
+  );
+  const [modalAberto, setModalAberto] = useState(false);
   const isAdmin = perfil?.id === "ag" || perfil?.id === "sa";
 
-  const ult = ultimaAuditoria();
+  const ult = [...lista].sort((a, b) => (a.data < b.data ? 1 : -1))[0];
 
   function nova() {
     if (!isAdmin) {
       toast("Apenas Admin do Ente registra auditoria.", "warn");
       return;
     }
-    openDrawer({
-      title: "Registrar Auditoria",
-      sub: "Preencha os dados (mock)",
-      body: (
-        <div className="flex flex-col gap-2 text-[11px] text-t2">
-          <div>Formulário simplificado (portar modal completo em próxima iteração).</div>
-        </div>
-      ),
-    });
+    setModalAberto(true);
+  }
+
+  function salvar(input: NovaAuditoriaInput) {
+    const novaAud = montarAuditoria(input, lista);
+    setData((prev) => [novaAud, ...prev].sort((a, b) => (a.data < b.data ? 1 : -1)));
+    criarAuditoria(input)
+      .then(() => reload())
+      .catch(() => toast("API offline — auditoria registrada localmente.", "warn"));
   }
 
   function abrir(a: Auditoria) {
@@ -114,6 +121,12 @@ export default function CertificacaoPage() {
 
   return (
     <div className="animate-fade-in">
+      {offline ? (
+        <Alert variant="warn" title="API indisponível — exibindo dados locais" className="mb-2">
+          Não foi possível conectar à API. As auditorias são exibidas do repositório local.
+        </Alert>
+      ) : null}
+
       <Alert
         variant="info"
         title="Central de Certificações — Auditoria · FUMPRES · Pró-Gestão v4.1"
@@ -152,7 +165,7 @@ export default function CertificacaoPage() {
         />
         <Kpi
           label="Total Registradas"
-          value={AUDITORIAS.length}
+          value={lista.length}
           icon={<UserCheck className="size-3 text-prp2" />}
           tone="text-prp2"
           delta="auditorias"
@@ -193,6 +206,13 @@ export default function CertificacaoPage() {
           </button>
         ))}
       </div>
+
+      {modalAberto && isAdmin ? (
+        <RegistrarAuditoriaModal
+          onClose={() => setModalAberto(false)}
+          onSalvar={salvar}
+        />
+      ) : null}
     </div>
   );
 }

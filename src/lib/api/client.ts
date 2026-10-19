@@ -1,7 +1,6 @@
 /* ==========================================================================
-   Camada de API — preparada para a integração com o backend FastAPI.
-   Ainda não é usada pelas telas (fase de mocks), mas centraliza base URL,
-   token JWT e tratamento de erro para quando plugarmos a API.
+   Camada base de API — base URL, token JWT e tratamento de erro.
+   Consumida pelos clients de domínio em src/lib/api/*.ts.
    ========================================================================== */
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";

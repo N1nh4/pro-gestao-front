@@ -11,14 +11,9 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import {
-  acoesDoRequisito,
-  type AcaoPlano,
-  type AcaoStatus,
-} from "@/lib/mock/acoes";
-import { temDiligenciaAberta } from "@/lib/mock/diligencias";
-import { DETALHE, type NivelPG, type Requisito } from "@/lib/mock/progestao";
-import { unidadeById } from "@/lib/mock/unidades";
+import { type AcaoPlano, type AcaoStatus } from "@/lib/domain/plano";
+import { temDiligenciaAberta, type Diligencia } from "@/lib/domain/diligencias";
+import { DETALHE, type NivelPG, type Requisito } from "@/lib/domain/progestao";
 
 const DIM_TONE: Record<Requisito["dim"], string> = {
   CI: "bg-acc3 text-acc2",
@@ -71,14 +66,26 @@ interface RequisitoRowProps {
   isAdmin: boolean;
   expanded: boolean;
   onToggle: () => void;
+  /** Ações do plano (default: mock filtrado por requisito). */
+  acoes?: AcaoPlano[];
+  /** Diligências (default: mock). */
+  diligencias?: Diligencia[];
 }
 
-export function RequisitoRow({ requisito, nivelPret, isAdmin, expanded, onToggle }: RequisitoRowProps) {
-  const acoes = acoesDoRequisito(requisito.cod);
+export function RequisitoRow({
+  requisito,
+  nivelPret,
+  isAdmin,
+  expanded,
+  onToggle,
+  acoes: acoesProp = [],
+  diligencias = [],
+}: RequisitoRowProps) {
+  const acoes = acoesProp;
   const apr = acoes.filter((a) => a.status === "APROVADO").length;
   const tot = acoes.length;
   const pct = tot ? Math.round((apr / tot) * 100) : 0;
-  const dilig = temDiligenciaAberta(acoes.map((a) => a.idAcao));
+  const dilig = temDiligenciaAberta(acoes.map((a) => a.idAcao), diligencias);
   const st = statusRequisito(pct, dilig);
 
   return (
@@ -244,7 +251,6 @@ function RequisitoDetalhe({
           </div>
           {acoes.length ? (
             acoes.map((a) => {
-              const un = unidadeById(a.unidadeId);
               return (
                 <div key={a.idAcao} className="mb-1.5 rounded border border-brd bg-bg1 px-2.5 py-2">
                   <div className="mb-0.5 flex items-center gap-1.5">
@@ -255,7 +261,7 @@ function RequisitoDetalhe({
                     </span>
                   </div>
                   <div className="text-[9px] text-t3">
-                    {un?.sigla || a.setor || "—"} · Prazo: {a.prazo || "—"}
+                    {a.setor || "—"} · Prazo: {a.prazo || "—"}
                   </div>
                 </div>
               );

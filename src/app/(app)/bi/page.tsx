@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert } from "@/components/ui/Alert";
 import { Card } from "@/components/ui/Card";
 import { Kpi } from "@/components/ui/Kpi";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler } from "chart.js";
@@ -8,18 +9,32 @@ import { useChartTheme } from "@/components/charts/useChartTheme";
 import { FileDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
+import { biConsolidado, type BiConsolidado } from "@/lib/api/bi";
+import { useApiResource } from "@/lib/useApiResource";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
-const DADOS_PLANO = {
-  labels: ["Pendente", "Enviado", "Aprovado", "Diligência"],
-  data: [18, 12, 88, 7],
-  colors: [
-    { bg: "#F59E0B", border: "#F59E0B" },
-    { bg: "#1A56C4", border: "#1A56C4" },
-    { bg: "#059669", border: "#059669" },
-    { bg: "#DC2626", border: "#DC2626" },
-  ],
+const STATUS_COLORS = [
+  { bg: "#F59E0B", border: "#F59E0B" },
+  { bg: "#1A56C4", border: "#1A56C4" },
+  { bg: "#059669", border: "#059669" },
+  { bg: "#DC2626", border: "#DC2626" },
+];
+
+const BI_FALLBACK: BiConsolidado = {
+  total_acoes: 125,
+  aprovadas: 88,
+  enviadas: 12,
+  pendentes: 18,
+  diligencias: 7,
+  pct_completude: 60,
+  nivel_estimado: "III",
+  por_requisito: [],
+  por_dimensao: {
+    CI: { total: 10, aprovadas: 8 },
+    GC: { total: 20, aprovadas: 13 },
+    EP: { total: 8, aprovadas: 6 },
+  },
 };
 
 const EVOL = {
@@ -27,17 +42,30 @@ const EVOL = {
   data: [35, 52, 68, 70, 72, 74],
 };
 
+function pctDim(bi: BiConsolidado, dim: string): number {
+  const d = bi.por_dimensao[dim];
+  if (!d || !d.total) return 0;
+  return Math.round((d.aprovadas / d.total) * 100);
+}
+
 export default function BiPage() {
   const { tick, grid } = useChartTheme();
   const { toast } = useToast();
+  const { data: bi, offline } = useApiResource("bi-consolidado", biConsolidado, BI_FALLBACK);
 
   return (
     <div className="animate-fade-in">
+      {offline ? (
+        <Alert variant="warn" title="API indisponível — exibindo dados locais" className="mb-2">
+          Não foi possível conectar à API. Os indicadores são exibidos do repositório local.
+        </Alert>
+      ) : null}
+
       <div className="mb-3 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        <Kpi label="Conformidade geral" value="60%" delta="88 / 146 itens" />
-        <Kpi label="Dimensão CI" value="80%" tone="text-grn2" delta="Controles Internos" deltaTone="text-grn2" />
-        <Kpi label="Dimensão GC" value="65%" tone="text-amb2" delta="Governança Corp." deltaTone="text-amb2" />
-        <Kpi label="Dimensão EP" value="75%" tone="text-acc2" delta="Ed. Previdenciária" deltaTone="text-acc2" />
+        <Kpi label="Conformidade geral" value={`${bi.pct_completude}%`} delta={`${bi.aprovadas} / ${bi.total_acoes} itens`} />
+        <Kpi label="Dimensão CI" value={`${pctDim(bi, "CI")}%`} tone="text-grn2" delta="Controles Internos" deltaTone="text-grn2" />
+        <Kpi label="Dimensão GC" value={`${pctDim(bi, "GC")}%`} tone="text-amb2" delta="Governança Corp." deltaTone="text-amb2" />
+        <Kpi label="Dimensão EP" value={`${pctDim(bi, "EP")}%`} tone="text-acc2" delta="Ed. Previdenciária" deltaTone="text-acc2" />
       </div>
 
       <div className="grid gap-2.5 lg:grid-cols-2">
@@ -46,11 +74,11 @@ export default function BiPage() {
           <div className="relative h-48">
             <Doughnut
               data={{
-                labels: DADOS_PLANO.labels,
+                labels: ["Pendente", "Enviado", "Aprovado", "Diligência"],
                 datasets: [
                   {
-                    data: DADOS_PLANO.data,
-                    backgroundColor: DADOS_PLANO.colors.map((c) => c.bg),
+                    data: [bi.pendentes, bi.enviadas, bi.aprovadas, bi.diligencias],
+                    backgroundColor: STATUS_COLORS.map((c) => c.bg),
                     borderWidth: 0,
                   },
                 ],

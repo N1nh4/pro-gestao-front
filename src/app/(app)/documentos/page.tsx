@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/cn";
-import { DOCS, DIM_LABEL, TIPO_TONE } from "@/lib/mock/docs";
+import { DIM_LABEL, TIPO_TONE, type DocModelo } from "@/lib/domain/docs";
 import { Download, FileText, Filter, Upload } from "lucide-react";
 
 function tipoIcon() {
@@ -21,29 +21,8 @@ export default function DocumentosPage() {
 
   const isAdmin = perfil?.id === "ag" || perfil?.id === "sa";
 
-  const data = useMemo(() => {
-    return DOCS.filter((d) => {
-      if (dim && d.dim !== dim) return false;
-      if (req && d.req !== req) return false;
-      if (search) {
-        const s = search.toLowerCase();
-        if (
-          !d.titulo.toLowerCase().includes(s) &&
-          !d.req.toLowerCase().includes(s) &&
-          !d.reqNome.toLowerCase().includes(s) &&
-          !d.acao.toLowerCase().includes(s)
-        )
-          return false;
-      }
-      return true;
-    });
-  }, [dim, req, search]);
-
-  const reqs = useMemo(() => {
-    const set = new Set<string>();
-    DOCS.forEach((d) => set.add(d.req));
-    return Array.from(set).sort();
-  }, []);
+  const data: DocModelo[] = [];
+  const reqs: string[] = [];
 
   function limpar() {
     setSearch("");
@@ -108,6 +87,11 @@ export default function DocumentosPage() {
       </Card>
 
       <div className="flex flex-col gap-2">
+        {data.length === 0 ? (
+          <div className="rounded-md border border-brd bg-bg1 px-3.5 py-6 text-center text-[11px] text-t3">
+            Nenhum documento modelo cadastrado.
+          </div>
+        ) : null}
         {data.map((d) => (
           <div key={d.id} className="rounded-md border border-brd bg-bg1 px-3.5 py-3">
             <div className="flex items-center gap-2.5">

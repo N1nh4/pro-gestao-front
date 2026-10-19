@@ -2,21 +2,32 @@
 
 import { useRouter } from "next/navigation";
 import { Award, Building, FileX, ListChecks, MessagesSquare, Target } from "lucide-react";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { Kpi } from "@/components/ui/Kpi";
 import { DimensaoChart } from "@/components/charts/DimensaoChart";
 import { EvolucaoChart } from "@/components/charts/EvolucaoChart";
 import { usePainelDrawers } from "@/components/painel/drawers";
-import { DILIGENCIAS, contarDiligenciasVencidas } from "@/lib/mock/diligencias";
+import { contarDiligenciasVencidas } from "@/lib/domain/diligencias";
+import { listarDiligencias } from "@/lib/api/diligencias";
+import { useApiResource } from "@/lib/useApiResource";
 
 export default function PainelPage() {
   const router = useRouter();
-  const { verCertAtual, verCertPret, verDocsVencidos, verDiligencias } = usePainelDrawers();
-  const vencidas = contarDiligenciasVencidas();
+  const dilResource = useApiResource("diligencias", listarDiligencias, []);
+  const diligencias = dilResource.data;
+  const { verCertAtual, verCertPret, verDocsVencidos, verDiligencias } = usePainelDrawers(diligencias);
+  const vencidas = contarDiligenciasVencidas(diligencias);
 
   return (
     <div className="animate-fade-in">
+      {dilResource.offline ? (
+        <Alert variant="warn" title="API indisponível — exibindo dados locais" className="mb-2">
+          Não foi possível conectar à API. Os indicadores são exibidos do repositório local.
+        </Alert>
+      ) : null}
+
       <div className="mb-3 flex items-center gap-2">
         <div className="text-[11px] text-t3">
           <Building className="mr-1 inline size-3.5 text-acc2" />
@@ -61,9 +72,9 @@ export default function PainelPage() {
         />
         <Kpi
           label="Diligências"
-          value={String(DILIGENCIAS.length)}
+          value={String(diligencias.length)}
           tone="text-red2"
-          delta={`${vencidas} vencida(s) · ${DILIGENCIAS.length - vencidas} em andamento`}
+          delta={`${vencidas} vencida(s) · ${diligencias.length - vencidas} em andamento`}
           icon={<MessagesSquare className="size-3.5 text-red2" />}
           onClick={verDiligencias}
         />

@@ -137,6 +137,19 @@ export function getPerfil(id: PerfilId): Perfil {
   return PERFIS[id];
 }
 
+/**
+ * Mapeia os nomes de perfil do backend para o PerfilId do frontend.
+ * Prioridade: Admin Master > Admin do Ente/Auditor Interno > Operador > Visualizador.
+ */
+export function perfilIdFromNomes(nomes: string[]): PerfilId {
+  const set = new Set(nomes);
+  if (set.has("Admin Master")) return "sa";
+  if (set.has("Admin do Ente") || set.has("Auditor Interno")) return "ag";
+  if (set.has("Operador")) return "op";
+  if (set.has("Visualizador")) return "lv";
+  return "lv";
+}
+
 export function pathForNav(id: NavId): string {
   return `/${id}`;
 }

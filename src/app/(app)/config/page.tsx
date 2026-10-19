@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
+import { EnteForm } from "@/components/config/EnteForm";
+import { UnidadesPanel } from "@/components/config/UnidadesPanel";
+import { UsuariosPanel } from "@/components/config/UsuariosPanel";
 import { cn } from "@/lib/cn";
 import { PERFIS } from "@/lib/rbac";
 import type { PerfilId } from "@/lib/types";
@@ -60,6 +63,8 @@ const TRILHA = [
 
 export default function ConfigPage() {
   const { perfil } = useAuth();
+  const isAdminEnte = perfil?.id === "ag" || perfil?.id === "sa";
+  const podeEditar = isAdminEnte;
   const visiveis = (perfil?.cfgTabs ?? ABAS).filter((t) => TABS[t]);
   const [tab, setTab] = useState(visiveis[0] ?? "manuais");
 
@@ -148,33 +153,9 @@ export default function ConfigPage() {
               </div>
             </Card>
           ) : tab === "ente" ? (
-            <Card>
-              <div className="mb-1 text-[12px] font-semibold text-t1">Ente</div>
-              <div className="text-[11px] text-t2">Dados cadastrais do ente (FUMPRES).</div>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-[11px]">
-                <div className="rounded border border-brd bg-bg2 px-2 py-1.5">
-                  <div className="text-t3">Razão Social</div>
-                  <div className="font-medium text-t1">FUMPRES — Fundação Municipal de Previdência Social</div>
-                </div>
-                <div className="rounded border border-brd bg-bg2 px-2 py-1.5">
-                  <div className="text-t3">Município/UF</div>
-                  <div className="font-medium text-t1">Salvador/BA</div>
-                </div>
-              </div>
-            </Card>
+            <EnteForm podeEditar={isAdminEnte} />
           ) : tab === "unidades" ? (
-            <Card>
-              <div className="mb-1 text-[12px] font-semibold text-t1">Unidades</div>
-              <div className="text-[11px] text-t2">Relação de unidades vinculadas.</div>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-[11px]">
-                {["un01", "un02", "un03", "un04", "un05", "un06"].map((u) => (
-                  <div key={u} className="rounded border border-brd bg-bg2 px-2 py-1.5">
-                    <div className="font-medium text-t1">{u}</div>
-                    <div className="text-t3">Unidade administrativa</div>
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <UnidadesPanel podeEditar={podeEditar} />
           ) : tab === "certificacoes" ? (
             <Card>
               <div className="mb-1 text-[12px] font-semibold text-t1">Histórico de Certificações</div>
@@ -202,40 +183,7 @@ export default function ConfigPage() {
               </div>
             </Card>
           ) : tab === "usuarios" ? (
-            <Card>
-              <div className="mb-1 text-[12px] font-semibold text-t1">Usuários</div>
-              <div className="text-[11px] text-t2">Usuários, perfis e setores.</div>
-              <div className="mt-2 flex flex-col gap-1.5 text-[11px]">
-                <div className="flex items-center gap-2 rounded border border-brd bg-bg2 px-2 py-1.5">
-                  <Users className="size-3.5 text-t3" />
-                  <div className="flex-1">
-                    <div className="font-medium text-t1">admin@fumpres.ba.gov.br — Felipe Araújo</div>
-                    <div className="text-t3">Perfis: Admin Master</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 rounded border border-brd bg-bg2 px-2 py-1.5">
-                  <Users className="size-3.5 text-t3" />
-                  <div className="flex-1">
-                    <div className="font-medium text-t1">auditor@fumpres.ba.gov.br — João Silva</div>
-                    <div className="text-t3">Perfis: Admin do Ente</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 rounded border border-brd bg-bg2 px-2 py-1.5">
-                  <Users className="size-3.5 text-t3" />
-                  <div className="flex-1">
-                    <div className="font-medium text-t1">operador@fumpres.ba.gov.br — Maria Costa</div>
-                    <div className="text-t3">Perfis: Operacional</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 rounded border border-brd bg-bg2 px-2 py-1.5">
-                  <Users className="size-3.5 text-t3" />
-                  <div className="flex-1">
-                    <div className="font-medium text-t1">viewer@previc.gov.br — Pedro Lima</div>
-                    <div className="text-t3">Perfis: Leitura</div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <UsuariosPanel podeEditar={podeEditar} />
           ) : tab === "trilha" ? (
             <Card>
               <div className="mb-1 text-[12px] font-semibold text-t1">Trilha de Auditoria</div>

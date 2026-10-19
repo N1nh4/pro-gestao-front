@@ -9,9 +9,12 @@ import { Card } from "@/components/ui/Card";
 import { Kpi } from "@/components/ui/Kpi";
 import { RequisitoRow } from "@/components/progestao/RequisitoRow";
 import { useAuth } from "@/context/AuthContext";
-import { ACOES, acoesAprovadas } from "@/lib/mock/acoes";
-import { temDiligenciaAberta } from "@/lib/mock/diligencias";
-import { REQUISITOS, nivelEstimado, type DimensaoId, type NivelPG } from "@/lib/mock/progestao";
+import { temDiligenciaAberta } from "@/lib/domain/diligencias";
+import { nivelEstimado, type DimensaoId, type NivelPG } from "@/lib/domain/progestao";
+import { listarAcoes } from "@/lib/api/plano";
+import { listarDiligencias } from "@/lib/api/diligencias";
+import { listarRequisitos } from "@/lib/api/requisitos";
+import { useApiResource } from "@/lib/useApiResource";
 
 export default function ProgestaoPage() {
   const { perfil } = useAuth();
@@ -20,22 +23,34 @@ export default function ProgestaoPage() {
   const [dim, setDim] = useState<"" | DimensaoId>("");
   const [status, setStatus] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const requisitosResource = useApiResource("requisitos", listarRequisitos, []);
+  const acoesResource = useApiResource("acoes", listarAcoes, []);
+  const dilResource = useApiResource("diligencias", listarDiligencias, []);
+
+  const requisitos = requisitosResource.data;
+  const acoes = acoesResource.data;
+  const diligencias = dilResource.data;
+
   const isAdmin = perfil?.id === "ag" || perfil?.id === "sa";
   const nivelPret: NivelPG = "IV";
+  const offline = requisitosResource.offline || acoesResource.offline || dilResource.offline;
 
-  const data = REQUISITOS.filter((r) => {
+  const acoesDoReq = (cod: string) => acoes.filter((a) => a.req === cod);
+
+  const data = requisitos.filter((r) => {
     if (dim && r.dim !== dim) return false;
     if (status) {
-      const acoes = ACOES.filter((a) => a.req === r.cod);
-      const apr = acoes.filter((a) => a.status === "APROVADO").length;
-      const tot = acoes.length;
+      const lista = acoesDoReq(r.cod);
+      const apr = lista.filter((a) => a.status === "APROVADO").length;
+      const tot = lista.length;
       const pct = tot ? Math.round((apr / tot) * 100) : 0;
       if (status === "ok" && pct !== 100) return false;
       if (status === "parcial" && !(pct > 0 && pct < 100)) return false;
       if (status === "nao" && pct !== 0) return false;
       if (status === "dil") {
-        const ids = acoes.map((a) => a.idAcao);
-        if (!temDiligenciaAberta(ids)) return false;
+        const ids = lista.map((a) => a.idAcao);
+        if (!temDiligenciaAberta(ids, diligencias)) return false;
       }
     }
     if (search) {
@@ -47,30 +62,30 @@ export default function ProgestaoPage() {
     return true;
   });
 
-  const tot = REQUISITOS.length;
+  const tot = requisitos.length;
   const ok = dataOk(100).length;
   const parc = dataOkRange(1, 99).length;
   const zero = dataOk(0).length;
 
-  const totAcoes = ACOES.length;
-  const totApr = acoesAprovadas();
+  const totAcoes = acoes.length;
+  const totApr = acoes.filter((a) => a.status === "APROVADO").length;
   const pctGeral = totAcoes ? Math.round((totApr / totAcoes) * 100) : 0;
   const nivelEst = nivelEstimado(totApr);
 
   function dataOk(p: number) {
-    return REQUISITOS.filter((r) => {
-      const acoes = ACOES.filter((a) => a.req === r.cod);
-      const apr = acoes.filter((a) => a.status === "APROVADO").length;
-      const pct = acoes.length ? Math.round((apr / acoes.length) * 100) : 0;
+    return requisitos.filter((r) => {
+      const lista = acoesDoReq(r.cod);
+      const apr = lista.filter((a) => a.status === "APROVADO").length;
+      const pct = lista.length ? Math.round((apr / lista.length) * 100) : 0;
       return pct === p;
     });
   }
 
   function dataOkRange(min: number, max: number) {
-    return REQUISITOS.filter((r) => {
-      const acoes = ACOES.filter((a) => a.req === r.cod);
-      const apr = acoes.filter((a) => a.status === "APROVADO").length;
-      const pct = acoes.length ? Math.round((apr / acoes.length) * 100) : 0;
+    return requisitos.filter((r) => {
+      const lista = acoesDoReq(r.cod);
+      const apr = lista.filter((a) => a.status === "APROVADO").length;
+      const pct = lista.length ? Math.round((apr / lista.length) * 100) : 0;
       return pct > min && pct < max;
     });
   }
@@ -81,6 +96,12 @@ export default function ProgestaoPage() {
 
   return (
     <div className="animate-fade-in">
+      {offline ? (
+        <Alert variant="warn" title="API indisponível — exibindo dados locais" className="mb-2">
+          Não foi possível conectar à API. O diagnóstico é exibido do repositório local.
+        </Alert>
+      ) : null}
+
       <Alert
         variant="info"
         title={`Diagnóstico — Alimentado pelo Plano de Ação · Nível pretendido: ${nivelPret}`}
@@ -177,6 +198,8 @@ export default function ProgestaoPage() {
             isAdmin={isAdmin}
             expanded={!!expanded[r.cod]}
             onToggle={() => toggle(r.cod)}
+            acoes={acoesDoReq(r.cod)}
+            diligencias={diligencias}
           />
         ))}
       </div>
