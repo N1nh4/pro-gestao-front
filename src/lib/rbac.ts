@@ -35,7 +35,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     badgeClass: "bg-acc3 text-acc2",
     setor: "TODOS",
     nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "bi", "documentos", "config", "parametros"],
-    cfgTabs: ["ente", "unidades", "certificacoes", "usuarios"],
+    cfgTabs: ["manuais", "ente", "unidades", "certificacoes", "usuarios"],
   },
   op: {
     id: "op",

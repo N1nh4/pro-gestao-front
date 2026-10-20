@@ -73,12 +73,12 @@ export function UsuariosPanel({ podeEditar }: { podeEditar: boolean }) {
                   <span className="truncate font-medium text-t1">{u.nome_completo}</span>
                   <span
                     className={
-                      u.status === "Ativo"
+                      u.status === "ativo"
                         ? "rounded bg-grn3 px-1.5 py-0.5 text-[9px] font-bold text-grn2"
                         : "rounded bg-bg3 px-1.5 py-0.5 text-[9px] font-bold text-t3"
                     }
                   >
-                    {u.status ?? "—"}
+                    {u.status === "ativo" ? "Ativo" : "Inativo"}
                   </span>
                 </div>
                 <div className="truncate text-t3">

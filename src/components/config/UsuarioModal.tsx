@@ -20,7 +20,7 @@ import { useApiResource } from "@/lib/useApiResource";
 const campo =
   "w-full rounded border border-brd2 bg-bg2 px-2.5 py-[6px] text-[11px] text-t1 placeholder:text-t4 focus:outline-none";
 
-const STATUS = ["Ativo", "Inativo"];
+const STATUS = ["ativo", "inativo"];
 
 export function UsuarioModal({
   usuario,
@@ -39,7 +39,7 @@ export function UsuarioModal({
   const [nome, setNome] = useState(usuario?.nome_completo ?? "");
   const [email, setEmail] = useState(usuario?.email ?? "");
   const [senha, setSenha] = useState("");
-  const [status, setStatus] = useState(usuario?.status ?? "Ativo");
+  const [status, setStatus] = useState(usuario?.status ?? "ativo");
   const [perfisSel, setPerfisSel] = useState<string[]>(
     usuario?.perfis.map((p) => p.id) ?? [],
   );
@@ -143,7 +143,7 @@ export function UsuarioModal({
                 disabled={!edicao}
               >
                 {STATUS.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>{s === "ativo" ? "Ativo" : "Inativo"}</option>
                 ))}
               </select>
             </label>
