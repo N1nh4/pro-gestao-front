@@ -23,6 +23,14 @@ export interface RequisitoDto {
   total_itens: number;
 }
 
+/** Requisito pronto para select: código, nome e versão do manual. */
+export interface RequisitoOpcao {
+  id_requisito: number;
+  cod_requisito: string;
+  nome_requisito: string;
+  rotulo: string;
+}
+
 export interface ItemDto {
   id_item: number;
   id_requisito: number;
@@ -162,4 +170,38 @@ export function atualizarItem(id: number, payload: Partial<ItemPayload>): Promis
 
 export function removerItem(id: number): Promise<void> {
   return apiFetch<void>(`/api/catalogo/itens/${id}`, { method: "DELETE" });
+}
+
+/* ── Níveis (catálogo) ──────────────────────────────────────────────
+   As certificações do ente ficam em /api/certificacoes (ver api/certificacoes.ts). */
+
+export interface NivelDto {
+  id_nivel: number;
+  nome_nivel: string;
+}
+
+export interface NivelPayload {
+  nome_nivel: string;
+}
+
+export function listarNiveis(): Promise<NivelDto[]> {
+  return apiFetch<NivelDto[]>("/api/catalogo/niveis");
+}
+
+export function criarNivel(payload: NivelPayload): Promise<NivelDto> {
+  return apiFetch<NivelDto>("/api/catalogo/niveis", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function atualizarNivel(id: number, payload: Partial<NivelPayload>): Promise<NivelDto> {
+  return apiFetch<NivelDto>(`/api/catalogo/niveis/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function removerNivel(id: number): Promise<void> {
+  return apiFetch<void>(`/api/catalogo/niveis/${id}`, { method: "DELETE" });
 }

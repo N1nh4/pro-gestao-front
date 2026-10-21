@@ -112,19 +112,68 @@ export function criarAuditoria(input: NovaAuditoriaInput): Promise<AuditoriaDto>
   return apiFetch<AuditoriaDto>("/api/auditorias", { method: "POST", body: JSON.stringify(body) });
 }
 
-/* ── Certificações ──────────────────────────────────────────────── */
+/* ── Certificações (tabela única, por ente) ──────────────────────── */
 
 export interface CertificacaoDto {
-  id: string;
-  nivel: string;
-  data_certificacao: string;
-  data_validade: string;
-  entidade_certificadora: string;
+  id_certificacao: number;
+  id_manual: number;
+  id_nivel: number;
+  nome_certificacao: string;
   status: string;
   numero_certificado: string | null;
-  observacoes: string | null;
+  data_certificacao: string | null;
+  data_validade: string | null;
+  entidade_certificadora: string | null;
+  criado_em: string | null;
+  atualizado_em: string | null;
+  nome_nivel: string;
+  nome_manual: string;
+  versao_manual: string;
 }
 
-export function listarCertificacoes(): Promise<CertificacaoDto[]> {
-  return apiFetch<CertificacaoDto[]>("/api/certificacoes");
+export interface CertificacaoPayload {
+  id_manual: number;
+  id_nivel: number;
+  nome_certificacao: string;
+  status?: string;
+  numero_certificado?: string | null;
+  data_certificacao?: string | null;
+  data_validade?: string | null;
+  entidade_certificadora?: string | null;
+}
+
+export type CertificacaoUpdatePayload = Partial<Omit<CertificacaoPayload, "id_manual">>;
+
+export function listarCertificacoes(filtro?: {
+  id_manual?: number;
+  id_nivel?: number;
+  status?: string;
+}): Promise<CertificacaoDto[]> {
+  const params = new URLSearchParams();
+  if (filtro?.id_manual != null) params.set("id_manual", String(filtro.id_manual));
+  if (filtro?.id_nivel != null) params.set("id_nivel", String(filtro.id_nivel));
+  if (filtro?.status) params.set("status", filtro.status);
+  const qs = params.toString();
+  return apiFetch<CertificacaoDto[]>(`/api/certificacoes${qs ? `?${qs}` : ""}`);
+}
+
+export function criarCertificacao(payload: CertificacaoPayload): Promise<CertificacaoDto> {
+  return apiFetch<CertificacaoDto>("/api/certificacoes", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function atualizarCertificacao(
+  id: number,
+  payload: CertificacaoUpdatePayload,
+): Promise<CertificacaoDto> {
+  return apiFetch<CertificacaoDto>(`/api/certificacoes/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function removerCertificacao(id: number): Promise<void> {
+  return apiFetch<void>(`/api/certificacoes/${id}`, { method: "DELETE" });
 }

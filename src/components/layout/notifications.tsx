@@ -53,7 +53,7 @@ function NotifBody({ onOpen }: { onOpen: () => void }) {
           </div>
           <div className="mt-1 text-[10px] text-t3">{a.sub}</div>
           <Button className="mt-1.5 text-[10px]" onClick={onOpen}>
-            Abrir Plano de Ação
+            Ver Certificações
           </Button>
         </div>
       ))}
@@ -70,14 +70,14 @@ export function useNotifications() {
   const router = useRouter();
 
   return useCallback(() => {
-    const abrirPlano = () => {
+    const abrirCertificacoes = () => {
       closeDrawer();
-      router.push("/plano");
+      router.push("/certificacoes");
     };
     openDrawer({
       title: "Notificações",
       sub: "Alertas e pendências recentes",
-      body: <NotifBody onOpen={abrirPlano} />,
+      body: <NotifBody onOpen={abrirCertificacoes} />,
     });
   }, [openDrawer, closeDrawer, router]);
 }

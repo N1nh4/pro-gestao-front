@@ -12,7 +12,7 @@ import type { AcaoPlano } from "@/lib/domain/plano";
 interface DiligenciaDto {
   id: string;
   num: string;
-  acao_id: string;
+  acao_id: number;
   situacao_detectada: string;
   criticidade: string;
   prazo_resposta: string | null;
@@ -72,6 +72,20 @@ export async function listarDiligencias(): Promise<Diligencia[]> {
   const [dtos, acoes] = await Promise.all([apiFetch<DiligenciaDto[]>("/api/diligencias"), listarAcoes()]);
   const map = new Map(acoes.map((a) => [a.idAcao, a]));
   return dtos.map((d) => toDiligencia(d, map.get(d.acao_id)));
+}
+
+export interface NovaDiligenciaPayload {
+  acao_id: number;
+  situacao_detectada: string;
+  criticidade: Criticidade;
+  prazo_resposta: string;
+}
+
+export function criarDiligencia(payload: NovaDiligenciaPayload): Promise<{ id: string; num: string }> {
+  return apiFetch("/api/diligencias", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export function enviarRetorno(apiId: string, retornoTexto: string): Promise<{ status: string }> {

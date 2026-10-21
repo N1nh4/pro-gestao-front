@@ -107,7 +107,7 @@ export default function ProgestaoPage() {
         title={`Diagnóstico — Alimentado pelo Plano de Ação · Nível pretendido: ${nivelPret}`}
         action={
           isAdmin ? (
-            <Button onClick={() => router.push("/plano")} className="h-6 px-2 text-[10px]">
+            <Button onClick={() => router.push("/certificacoes")} className="h-6 px-2 text-[10px]">
               <FileText className="size-3" />
               Plano de Ação
             </Button>

@@ -154,9 +154,9 @@ export function usePainelDrawers(diligencias: Diligencia[] = []) {
   const { openDrawer, closeDrawer } = useDrawer();
   const router = useRouter();
 
-  const abrirPlano = useCallback(() => {
+  const abrirCertificacoes = useCallback(() => {
     closeDrawer();
-    router.push("/plano");
+    router.push("/certificacoes");
   }, [closeDrawer, router]);
 
   const verCertAtual = useCallback(
@@ -196,14 +196,14 @@ export function usePainelDrawers(diligencias: Diligencia[] = []) {
       openDrawer({
         title: "Diligências",
         sub: `${vencidas} vencida(s) · ${diligencias.length - vencidas} em andamento`,
-        body: <DiligListBody diligencias={diligencias} onOpen={abrirPlano} />,
+        body: <DiligListBody diligencias={diligencias} onOpen={abrirCertificacoes} />,
         footer: (
-          <Button variant="pri" onClick={abrirPlano}>
-            Abrir Plano de Ação
+          <Button variant="pri" onClick={abrirCertificacoes}>
+            Ver Certificações
           </Button>
         ),
       }),
-    [openDrawer, abrirPlano, diligencias, vencidas],
+    [openDrawer, abrirCertificacoes, diligencias, vencidas],
   );
 
   return { verCertAtual, verCertPret, verDocsVencidos, verDiligencias };

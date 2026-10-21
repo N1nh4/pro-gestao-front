@@ -84,7 +84,7 @@ export default function PainelPage() {
           tone="text-amb2"
           delta="Plano de Ação"
           icon={<ListChecks className="size-3.5 text-amb2" />}
-          onClick={() => router.push("/plano")}
+          onClick={() => router.push("/certificacoes")}
         />
       </div>
 

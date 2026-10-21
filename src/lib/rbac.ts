@@ -17,9 +17,9 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     nav: [
       "painel",
       "progestao",
-      "plano",
       "diligencias",
       "certificacao",
+      "certificacoes",
       "documentos",
       "config",
       "parametros",
@@ -33,7 +33,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Admin do Ente",
     badgeClass: "bg-acc3 text-acc2",
     setor: "TODOS",
-    nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "documentos", "config", "parametros"],
+    nav: ["painel", "progestao", "diligencias", "certificacao", "certificacoes", "documentos", "config", "parametros"],
     cfgTabs: ["ente", "unidades", "certificacoes", "usuarios"],
   },
   op: {
@@ -43,7 +43,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Operacional",
     badgeClass: "bg-amb3 text-amb2",
     setor: "GEFIN",
-    nav: ["painel", "progestao", "plano", "diligencias", "documentos"],
+    nav: ["painel", "progestao", "certificacoes", "diligencias", "documentos"],
     cfgTabs: [],
   },
   lv: {
@@ -53,7 +53,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Leitura",
     badgeClass: "bg-bg3 text-t3",
     setor: null,
-    nav: ["painel", "progestao", "diligencias", "certificacao", "documentos"],
+    nav: ["painel", "progestao", "diligencias", "certificacao", "certificacoes", "documentos"],
     cfgTabs: [],
   },
 };
@@ -62,9 +62,9 @@ export const PERFIS: Record<PerfilId, Perfil> = {
 export const NAV_ORDER: NavId[] = [
   "painel",
   "progestao",
-  "plano",
   "diligencias",
   "certificacao",
+  "certificacoes",
   "documentos",
   "config",
   "parametros",
@@ -73,9 +73,9 @@ export const NAV_ORDER: NavId[] = [
 export const NAV_DEF: Record<NavId, NavDef> = {
   painel: { label: "Painel Analítico", icon: "bar-chart-3" },
   progestao: { label: "Diagnóstico", icon: "stethoscope" },
-  plano: { label: "Plano de Ação", icon: "list-checks", badge: 5 },
   diligencias: { label: "Diligências", icon: "messages-square", badge: 2 },
   certificacao: { label: "Auditoria", icon: "shield-check" },
+  certificacoes: { label: "Certificações", icon: "award" },
   documentos: { label: "Doc. Modelos", icon: "file-text" },
   config: { label: "Configurações", icon: "settings" },
   parametros: { label: "Parâmetros", icon: "sliders-horizontal" },
@@ -85,9 +85,9 @@ export const NAV_DEF: Record<NavId, NavDef> = {
 export const TITLES: Record<string, string> = {
   painel: "Painel Analítico",
   progestao: "Diagnóstico",
-  plano: "Plano de Ação",
   diligencias: "Diligências",
   certificacao: "Auditoria",
+  certificacoes: "Certificações",
   documentos: "Documentos Modelos",
   config: "Configurações",
   manual: "Manuais",
@@ -96,7 +96,7 @@ export const TITLES: Record<string, string> = {
 
 /** Rótulo do botão de ação primária por tela. */
 export const PRIMARY_ACTIONS: Record<string, string> = {
-  plano: "Nova ação",
+  certificacoes: "Nova certificação",
 };
 
 const CRED_MAP: Record<string, { pwd: string; perfil: PerfilId }> = {

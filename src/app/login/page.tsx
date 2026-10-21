@@ -197,10 +197,10 @@ export default function LoginPage() {
             <div className="flex justify-center gap-2.5">
               <button
                 type="button"
-                onClick={() => router.replace("/plano")}
+                onClick={() => router.replace("/certificacoes")}
                 className="cursor-pointer rounded-md border border-acc bg-acc px-3 py-1.5 text-[11px] font-medium text-white transition-colors hover:bg-acc2"
               >
-                Abrir Plano de Ação
+                Ver Certificações
               </button>
               <button
                 type="button"

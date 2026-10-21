@@ -35,7 +35,7 @@ export interface DiligenciaChat {
 
 export interface Diligencia {
   num: string;
-  acaoCod: string;
+  acaoCod: number;
   cod: string;
   acaoItem: string;
   setor: string;
@@ -94,6 +94,6 @@ export function isDiligenciaAberta(d: Diligencia): boolean {
   return d.status !== "aprovada" && d.status !== "remitida";
 }
 
-export function temDiligenciaAberta(idsAcao: string[], lista: Diligencia[] = []): boolean {
+export function temDiligenciaAberta(idsAcao: number[], lista: Diligencia[] = []): boolean {
   return lista.some((d) => idsAcao.includes(d.acaoCod) && isDiligenciaAberta(d));
 }

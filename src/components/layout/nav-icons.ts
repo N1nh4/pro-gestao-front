@@ -1,4 +1,5 @@
 import {
+  Award,
   ChartColumn,
   FileText,
   ListChecks,
@@ -16,6 +17,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   "list-checks": ListChecks,
   "messages-square": MessagesSquare,
   "shield-check": ShieldCheck,
+  award: Award,
   "bar-chart-3": ChartColumn,
   "file-text": FileText,
   settings: Settings,

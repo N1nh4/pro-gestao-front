@@ -5,9 +5,9 @@ export type PerfilId = "sa" | "ag" | "op" | "lv";
 export type NavId =
   | "painel"
   | "progestao"
-  | "plano"
   | "diligencias"
   | "certificacao"
+  | "certificacoes"
   | "documentos"
   | "config"
   | "parametros";
