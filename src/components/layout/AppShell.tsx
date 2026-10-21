@@ -14,7 +14,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const segment = pathname.split("/")[1] as NavId;
-  const allowed = perfil ? perfil.nav.includes(segment) : false;
+
+  /**
+   * Rotas de detalhe fora do sidebar (ex.: /manual/[id]): não existem como item
+   * de navegação, então herdam a permissão da aba de Configuração que as hospeda.
+   */
+  const ABA_DA_ROTA: Record<string, string> = { manual: "manuais" };
+  const abaDaRota = ABA_DA_ROTA[segment];
+
+  const allowed = perfil
+    ? perfil.nav.includes(segment) ||
+      (abaDaRota !== undefined &&
+        perfil.nav.includes("config") &&
+        perfil.cfgTabs.includes(abaDaRota))
+    : false;
 
   useEffect(() => {
     if (!ready) return;
@@ -22,10 +35,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       router.replace("/login");
       return;
     }
-    if (!perfil.nav.includes(segment)) {
+    if (!allowed) {
       router.replace(pathForNav(perfil.nav[0]));
     }
-  }, [ready, user, perfil, segment, router]);
+  }, [ready, user, perfil, allowed, router]);
 
   if (!ready || !user || !perfil || !allowed) {
     return (

@@ -8,7 +8,6 @@ export type NavId =
   | "plano"
   | "diligencias"
   | "certificacao"
-  | "bi"
   | "documentos"
   | "config"
   | "parametros";

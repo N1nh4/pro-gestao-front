@@ -20,7 +20,6 @@ export const PERFIS: Record<PerfilId, Perfil> = {
       "plano",
       "diligencias",
       "certificacao",
-      "bi",
       "documentos",
       "config",
       "parametros",
@@ -34,8 +33,8 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Admin do Ente",
     badgeClass: "bg-acc3 text-acc2",
     setor: "TODOS",
-    nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "bi", "documentos", "config", "parametros"],
-    cfgTabs: ["manuais", "ente", "unidades", "certificacoes", "usuarios"],
+    nav: ["painel", "progestao", "plano", "diligencias", "certificacao", "documentos", "config", "parametros"],
+    cfgTabs: ["ente", "unidades", "certificacoes", "usuarios"],
   },
   op: {
     id: "op",
@@ -54,7 +53,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Leitura",
     badgeClass: "bg-bg3 text-t3",
     setor: null,
-    nav: ["painel", "progestao", "diligencias", "certificacao", "bi", "documentos"],
+    nav: ["painel", "progestao", "diligencias", "certificacao", "documentos"],
     cfgTabs: [],
   },
 };
@@ -66,19 +65,17 @@ export const NAV_ORDER: NavId[] = [
   "plano",
   "diligencias",
   "certificacao",
-  "bi",
   "documentos",
   "config",
   "parametros",
 ];
 
 export const NAV_DEF: Record<NavId, NavDef> = {
-  painel: { label: "Painel Executivo", icon: "layout-dashboard" },
+  painel: { label: "Painel Analítico", icon: "bar-chart-3" },
   progestao: { label: "Diagnóstico", icon: "stethoscope" },
   plano: { label: "Plano de Ação", icon: "list-checks", badge: 5 },
   diligencias: { label: "Diligências", icon: "messages-square", badge: 2 },
   certificacao: { label: "Auditoria", icon: "shield-check" },
-  bi: { label: "Painel Analítico", icon: "bar-chart-3" },
   documentos: { label: "Doc. Modelos", icon: "file-text" },
   config: { label: "Configurações", icon: "settings" },
   parametros: { label: "Parâmetros", icon: "sliders-horizontal" },
@@ -86,14 +83,14 @@ export const NAV_DEF: Record<NavId, NavDef> = {
 
 /** Títulos usados na topbar (inclui telas ainda não migradas). */
 export const TITLES: Record<string, string> = {
-  painel: "Painel Executivo",
+  painel: "Painel Analítico",
   progestao: "Diagnóstico",
   plano: "Plano de Ação",
   diligencias: "Diligências",
   certificacao: "Auditoria",
-  bi: "Painel Analítico (BI)",
   documentos: "Documentos Modelos",
   config: "Configurações",
+  manual: "Manuais",
   parametros: "Parâmetros",
 };
 

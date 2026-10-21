@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
-import { CatalogoPanel } from "@/components/config/CatalogoPanel";
+import { ManuaisPanel } from "@/components/config/ManuaisPanel";
 import { EnteForm } from "@/components/config/EnteForm";
 import { UnidadesPanel } from "@/components/config/UnidadesPanel";
 import { UsuariosPanel } from "@/components/config/UsuariosPanel";
@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 const TABS: Record<string, string> = {
-  manuais: "Catálogo",
+  manuais: "Manuais",
   perfis: "Perfis",
   ente: "Ente",
   unidades: "Unidades",
@@ -94,7 +94,7 @@ export default function ConfigPage() {
         </aside>
         <section className="p-4">
           {tab === "manuais" ? (
-            <CatalogoPanel podeEditar={podeEditar} />
+            <ManuaisPanel podeEditar={podeEditar} />
           ) : tab === "perfis" ? (
             <Card>
               <div className="mb-1 text-[12px] font-semibold text-t1">Perfis de Acesso</div>

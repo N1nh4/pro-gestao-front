@@ -1,7 +1,6 @@
 import {
   ChartColumn,
   FileText,
-  LayoutDashboard,
   ListChecks,
   MessagesSquare,
   Settings,
@@ -13,7 +12,6 @@ import {
 
 /** Mapeia a chave definida em rbac.NAV_DEF para o ícone Lucide correspondente. */
 export const NAV_ICONS: Record<string, LucideIcon> = {
-  "layout-dashboard": LayoutDashboard,
   stethoscope: Stethoscope,
   "list-checks": ListChecks,
   "messages-square": MessagesSquare,
