@@ -72,7 +72,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
             open ? "translate-x-0" : "translate-x-full",
           )}
         >
-          <header className="flex items-start gap-2 border-b border-brd px-4 py-3">
+          <header className="flex h-[51px] items-center gap-2 border-b border-brd px-4">
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] font-bold text-t1">{config?.title}</div>
               {config?.sub ? (

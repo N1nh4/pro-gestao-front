@@ -82,7 +82,7 @@ export function RegistrarAuditoriaModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
       <div className="animate-fade-in max-h-[92vh] w-full max-w-[640px] overflow-hidden rounded-lg border border-brd bg-bg1 shadow-xl shadow-black/40">
-        <div className="flex items-start justify-between border-b border-brd bg-bg2 px-4 py-3">
+        <div className="flex h-[51px] items-center justify-between border-b border-brd bg-bg2 px-4">
           <div>
             <div className="text-[13px] font-bold text-t1">Registrar Auditoria</div>
             <div className="mt-0.5 text-[10px] text-t3">Preencha os dados da auditoria realizada</div>

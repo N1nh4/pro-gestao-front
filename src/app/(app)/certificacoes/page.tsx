@@ -156,6 +156,19 @@ export default function CertificacoesPage() {
               <div className="mt-3 flex justify-end gap-1 border-t border-brd pt-2">
                 <button
                   type="button"
+                  onClick={() =>
+                    router.push(
+                      `/certificacoes/${certificacao.id_certificacao}`,
+                    )
+                  }
+                  title="Visualizar plano de ação"
+                  aria-label={`Visualizar certificação ${certificacao.nome_certificacao}`}
+                  className="cursor-pointer rounded p-1.5 text-t3 transition-colors hover:bg-bg3 hover:text-acc2"
+                >
+                  <Eye className="size-3.5" />
+                </button>
+                <button
+                  type="button"
                   onClick={() => {
                     setEditando(certificacao);
                     setModalAberto(true);
@@ -182,19 +195,6 @@ export default function CertificacoesPage() {
                   className="cursor-pointer rounded p-1.5 text-t3 transition-colors hover:bg-red3 hover:text-red2 disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   <Trash2 className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    router.push(
-                      `/certificacoes/${certificacao.id_certificacao}`,
-                    )
-                  }
-                  title="Visualizar plano de ação"
-                  aria-label={`Visualizar certificação ${certificacao.nome_certificacao}`}
-                  className="cursor-pointer rounded p-1.5 text-t3 transition-colors hover:bg-bg3 hover:text-acc2"
-                >
-                  <Eye className="size-3.5" />
                 </button>
               </div>
             </article>

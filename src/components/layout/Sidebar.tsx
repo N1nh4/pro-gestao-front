@@ -24,7 +24,7 @@ export function Sidebar() {
 
   return (
     <aside className="flex h-screen w-56 shrink-0 flex-col overflow-hidden border-r border-brd bg-bg1">
-      <div className="flex items-center gap-2 border-b border-brd px-3 pb-2.5 pt-3">
+      <div className="flex h-[51px] items-center gap-2 border-b border-brd px-3">
         <div className="flex size-7 shrink-0 items-center justify-center rounded bg-acc text-[10px] font-bold text-white">
           SAC
         </div>

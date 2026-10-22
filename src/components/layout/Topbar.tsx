@@ -41,7 +41,7 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
   }, []);
 
   return (
-    <header className="flex shrink-0 items-center gap-2 border-b border-brd bg-bg1 px-4 py-[7px]">
+    <header className="flex h-[51px] shrink-0 items-center gap-2 border-b border-brd bg-bg1 px-4">
       <div className="flex-1 text-[13px] font-bold text-t1">{title}</div>
 
       <div className="flex gap-0.5 rounded border border-brd2 bg-bg2 p-0.5">
