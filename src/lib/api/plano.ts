@@ -14,7 +14,7 @@ interface AcaoDocumentoDto {
 
 export interface AcaoDto {
   id_acao: number;
-  id_certificacao: number;
+  id_auditoria: string;
   id_requisito: number;
   id_item: number | null;
   id_unidade: string;
@@ -31,6 +31,7 @@ export interface AcaoDto {
   sigla_unidade: string;
   nome_unidade: string;
   nome_certificacao: string;
+  nome_manual: string;
   nome_nivel: string;
   versao_manual: string;
   historico: { dt: string; ev: string }[];
@@ -44,7 +45,7 @@ export function toAcaoPlano(dto: AcaoDto): AcaoPlano {
   const status = (STATUS.includes(dto.status as AcaoStatus) ? dto.status : "PENDENTE") as AcaoStatus;
   return {
     idAcao: dto.id_acao,
-    idCertificacao: dto.id_certificacao,
+    idAuditoria: dto.id_auditoria,
     idRequisito: dto.id_requisito,
     idItem: dto.id_item,
     req: dto.cod_requisito,
@@ -55,6 +56,7 @@ export function toAcaoPlano(dto: AcaoDto): AcaoPlano {
     unidadeId: dto.id_unidade,
     setor: dto.sigla_unidade || dto.nome_unidade || "",
     certificacao: dto.nome_certificacao,
+    manual: dto.nome_manual,
     nivel: dto.nome_nivel,
     prazo: dto.prazo ?? "",
     dtEnvio: dto.data_envio,
@@ -76,12 +78,14 @@ export function toAcaoPlano(dto: AcaoDto): AcaoPlano {
 }
 
 export async function listarAcoes(filtro?: {
+  id_auditoria?: string;
   id_certificacao?: number;
   id_unidade?: string;
   id_requisito?: number;
   status?: string;
 }): Promise<AcaoPlano[]> {
   const params = new URLSearchParams();
+  if (filtro?.id_auditoria) params.set("id_auditoria", filtro.id_auditoria);
   if (filtro?.id_certificacao != null) params.set("id_certificacao", String(filtro.id_certificacao));
   if (filtro?.id_unidade != null) params.set("id_unidade", filtro.id_unidade);
   if (filtro?.id_requisito != null) params.set("id_requisito", String(filtro.id_requisito));
@@ -92,7 +96,7 @@ export async function listarAcoes(filtro?: {
 }
 
 export interface NovaAcaoPayload {
-  id_certificacao?: number;
+  id_auditoria: string;
   id_requisito: number;
   id_item: number;
   nome: string;

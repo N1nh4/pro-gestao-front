@@ -2,22 +2,10 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { CircleAlert, Eye, EyeOff, LoaderCircle, LogIn, TriangleAlert, User } from "lucide-react";
+import { CircleAlert, Eye, EyeOff, LoaderCircle, LogIn, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/cn";
 import { DEMO_CREDENTIALS, SENHA_DEMO } from "@/lib/rbac";
-import type { PerfilId } from "@/lib/types";
-
-const POPUPS: Partial<Record<PerfilId, { titulo: string; msg: string }>> = {
-  op: {
-    titulo: "⚠ Diligência vencida no seu setor",
-    msg: "Você possui diligências vencidas que requerem resposta imediata no setor GEFIN.",
-  },
-  ag: {
-    titulo: "⚠ Diligências críticas vencidas",
-    msg: "Existem 2 diligências vencidas que bloqueiam o Nível IV. Verifique o Plano de Ação.",
-  },
-};
 
 export default function LoginPage() {
   const { user, ready, login } = useAuth();
@@ -29,7 +17,6 @@ export default function LoginPage() {
   const [erro, setErro] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [shake, setShake] = useState(false);
-  const [popup, setPopup] = useState<PerfilId | null>(null);
 
   useEffect(() => {
     if (ready && user) router.replace("/painel");
@@ -56,8 +43,7 @@ export default function LoginPage() {
         dispararShake();
         return;
       }
-      if (resultado.perfil && POPUPS[resultado.perfil]) setPopup(resultado.perfil);
-      else router.replace("/painel");
+      router.replace("/painel");
     },
     [login, router, dispararShake],
   );
@@ -187,32 +173,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
-      {popup ? (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/60 p-6">
-          <div className="w-full max-w-sm rounded-xl border border-brd2 bg-bg1 p-6 text-center">
-            <TriangleAlert className="mx-auto mb-2.5 size-9 text-red2" />
-            <div className="mb-2 text-[15px] font-extrabold text-t1">{POPUPS[popup]?.titulo}</div>
-            <div className="mb-4 text-xs leading-relaxed text-t2">{POPUPS[popup]?.msg}</div>
-            <div className="flex justify-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => router.replace("/certificacoes")}
-                className="cursor-pointer rounded-md border border-acc bg-acc px-3 py-1.5 text-[11px] font-medium text-white transition-colors hover:bg-acc2"
-              >
-                Ver Certificações
-              </button>
-              <button
-                type="button"
-                onClick={() => router.replace("/painel")}
-                className="cursor-pointer rounded-md border border-brd2 bg-bg2 px-3 py-1.5 text-[11px] font-medium text-t2 transition-colors hover:bg-bg3 hover:text-t1"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

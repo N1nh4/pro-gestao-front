@@ -88,6 +88,7 @@ export const TITLES: Record<string, string> = {
   diligencias: "Diligências",
   certificacao: "Auditoria",
   certificacoes: "Certificações",
+  auditorias: "Auditoria",
   documentos: "Documentos Modelos",
   config: "Configurações",
   manual: "Manuais",

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
 import { cn } from "@/lib/cn";
-import { listarManuais, listarNiveis, type ManualDto, type NivelDto } from "@/lib/api/catalogo";
-import { type CertificacaoDto } from "@/lib/api/certificacoes";
+import { type CertificacaoDto, type CertificacaoPayload } from "@/lib/api/certificacoes";
 
 const campo =
   "w-full rounded border border-brd2 bg-bg2 px-2.5 py-[6px] text-[11px] text-t1 placeholder:text-t4 focus:outline-none";
@@ -25,26 +24,9 @@ export function CertificacaoModal({
   /** null = nova certificação. */
   certificacao: CertificacaoDto | null;
   onClose: () => void;
-  onSalvar: (payload: {
-    id_manual: number;
-    id_nivel: number;
-    nome_certificacao: string;
-    status: string;
-    numero_certificado: string | null;
-    data_certificacao: string | null;
-    data_validade: string | null;
-    entidade_certificadora: string | null;
-  }) => Promise<void> | void;
+  onSalvar: (payload: CertificacaoPayload) => Promise<void> | void;
 }) {
   const { toast } = useToast();
-  const [manuais, setManuais] = useState<ManualDto[]>([]);
-  const [niveis, setNiveis] = useState<NivelDto[]>([]);
-  const [idManual, setIdManual] = useState<string>(
-    certificacao ? String(certificacao.id_manual) : "",
-  );
-  const [idNivel, setIdNivel] = useState<string>(
-    certificacao ? String(certificacao.id_nivel) : "",
-  );
   const [nome, setNome] = useState(certificacao?.nome_certificacao ?? "");
   const [status, setStatus] = useState(certificacao?.status ?? "PENDENTE");
   const [numero, setNumero] = useState(certificacao?.numero_certificado ?? "");
@@ -53,40 +35,12 @@ export function CertificacaoModal({
   const [entidade, setEntidade] = useState(certificacao?.entidade_certificadora ?? "");
   const [salvando, setSalvando] = useState(false);
 
-  useEffect(() => {
-    let ativo = true;
-    Promise.all([listarManuais(), listarNiveis()])
-      .then(([listaManuais, listaNiveis]) => {
-        if (!ativo) return;
-        setManuais(listaManuais);
-        setNiveis(listaNiveis);
-      })
-      .catch((error: unknown) => {
-        if (!ativo) return;
-        setManuais([]);
-        setNiveis([]);
-        toast(
-          error instanceof Error
-            ? error.message
-            : "Não foi possível carregar manuais e níveis",
-          "err",
-        );
-      });
-    return () => {
-      ativo = false;
-    };
-  }, [toast]);
-
   async function confirmar() {
-    if (!idManual) return toast("Selecione o manual", "warn");
-    if (!idNivel) return toast("Selecione o nível", "warn");
     if (!nome.trim()) return toast("Informe o nome da certificação", "warn");
 
     setSalvando(true);
     try {
       await onSalvar({
-        id_manual: Number(idManual),
-        id_nivel: Number(idNivel),
         nome_certificacao: nome.trim(),
         status,
         numero_certificado: numero.trim() || null,
@@ -114,7 +68,7 @@ export function CertificacaoModal({
               {certificacao ? "Editar Certificação" : "Nova Certificação"}
             </div>
             <div className="mt-0.5 text-[10px] text-t3">
-              Certificação do ente em um nível de um manual do Pró-Gestão
+              Certificado do ente — as auditorias (manual + nível) ficam dentro dele
             </div>
           </div>
           <button
@@ -128,40 +82,6 @@ export function CertificacaoModal({
         </div>
 
         <div className="space-y-3 p-4">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="block text-[10px] font-semibold text-t2">
-              Manual
-              <select
-                value={idManual}
-                onChange={(e) => setIdManual(e.target.value)}
-                disabled={Boolean(certificacao)}
-                className={cn(campo, "mt-1")}
-              >
-                <option value="">— Selecione —</option>
-                {manuais.map((m) => (
-                  <option key={m.id_manual} value={m.id_manual}>
-                    {m.nome_manual} (v{m.versao_manual})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-[10px] font-semibold text-t2">
-              Nível
-              <select
-                value={idNivel}
-                onChange={(e) => setIdNivel(e.target.value)}
-                className={cn(campo, "mt-1")}
-              >
-                <option value="">— Selecione —</option>
-                {niveis.map((n) => (
-                  <option key={n.id_nivel} value={n.id_nivel}>
-                    Nível {n.nome_nivel}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
           <label className="block text-[10px] font-semibold text-t2">
             Nome da certificação
             <input

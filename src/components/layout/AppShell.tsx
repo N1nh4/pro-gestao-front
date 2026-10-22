@@ -22,8 +22,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const ABA_DA_ROTA: Record<string, string> = { manual: "manuais" };
   const abaDaRota = ABA_DA_ROTA[segment];
 
+  /** Rotas de detalhe que herdam a navegação de outra aba (ex.: /auditorias/[id]). */
+  const HERDA_NAV: Record<string, NavId> = { auditorias: "certificacoes" };
+  const navHerdada = HERDA_NAV[segment];
+
   const allowed = perfil
     ? perfil.nav.includes(segment) ||
+      (navHerdada !== undefined && perfil.nav.includes(navHerdada)) ||
       (abaDaRota !== undefined &&
         perfil.nav.includes("config") &&
         perfil.cfgTabs.includes(abaDaRota))
@@ -50,10 +55,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isAdmin = perfil.id === "ag" || perfil.id === "sa";
   const primaryLabel =
     isAdmin && segment === "certificacoes" && pathname !== "/certificacoes"
-      ? "Nova ação"
-      : isAdmin
-        ? PRIMARY_ACTIONS[segment]
-        : undefined;
+      ? "Nova auditoria"
+      : isAdmin && pathname.startsWith("/auditorias")
+        ? "Nova ação"
+        : isAdmin
+          ? PRIMARY_ACTIONS[segment]
+          : undefined;
 
   return (
     <div className="flex h-screen overflow-hidden">

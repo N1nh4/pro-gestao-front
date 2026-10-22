@@ -1,100 +1,52 @@
 /* ==========================================================================
-   AUDITORIAS (mock) — portado de sac-progestao-demo.html
-   Fase 6 — Central de Certificações (/certificacao)
+   AUDITORIAS — rótulos e tons (sem dados).
+   Os valores da API são slugs; aqui ficam os labels exibidos e as cores.
    ========================================================================== */
 
-export type TipoAuditoria =
-  | "Auditoria Inicial"
-  | "Pré-Auditoria"
-  | "Supervisão Documental"
-  | "Supervisão Presencial"
-  | "Renovação"
-  | "Mudança de Nível";
+export const TIPO_OPCOES = [
+  { valor: "auditoria_inicial", rotulo: "Auditoria Inicial" },
+  { valor: "pre_auditoria", rotulo: "Pré-Auditoria" },
+  { valor: "supervisao_documental", rotulo: "Supervisão Documental" },
+  { valor: "supervisao_presencial", rotulo: "Supervisão Presencial" },
+  { valor: "renovacao", rotulo: "Renovação" },
+  { valor: "mudanca_nivel", rotulo: "Mudança de Nível" },
+] as const;
 
-export type Conclusao = "Aprovado" | "Aprovado com ressalvas" | "Reprovado";
+export const MODALIDADE_OPCOES = [
+  { valor: "presencial", rotulo: "Presencial" },
+  { valor: "remota", rotulo: "Remota" },
+  { valor: "hibrida", rotulo: "Híbrida" },
+] as const;
 
-export type Modalidade = "Presencial" | "Remota" | "Híbrida";
+export const CONCLUSAO_OPCOES = [
+  { valor: "pendente", rotulo: "Pendente" },
+  { valor: "aprovado", rotulo: "Aprovado" },
+  { valor: "aprovado_ressalvas", rotulo: "Aprovado com ressalvas" },
+  { valor: "reprovado", rotulo: "Reprovado" },
+  { valor: "diligencia", rotulo: "Diligência" },
+] as const;
 
-export interface Auditoria {
-  id: string;
-  tipo: TipoAuditoria;
-  data: string;
-  empresa: string;
-  auditor: string;
-  modalidade: Modalidade;
-  duracao: string;
-  nivelAuditado: "I" | "II" | "III" | "IV";
-  nivelRecomendado: "I" | "II" | "III" | "IV";
-  conclusao: Conclusao;
-  criticidades: number;
-  parecer: string;
-  obs?: string;
+const ROTULOS = new Map<string, string>(
+  [...TIPO_OPCOES, ...MODALIDADE_OPCOES, ...CONCLUSAO_OPCOES].map((o) => [o.valor, o.rotulo]),
+);
+
+export function rotulo(valor: string | null | undefined, fallback = "—"): string {
+  if (!valor) return fallback;
+  return ROTULOS.get(valor) ?? valor;
 }
 
-export const TIPO_COR: Record<TipoAuditoria, string> = {
-  "Auditoria Inicial": "var(--org2)",
-  "Pré-Auditoria": "var(--acc2)",
-  "Supervisão Documental": "var(--prp2)",
-  "Supervisão Presencial": "var(--grn2)",
-  Renovação: "var(--amb2)",
-  "Mudança de Nível": "var(--red2)",
+export const TIPO_COR: Record<string, string> = {
+  auditoria_inicial: "var(--org2)",
+  pre_auditoria: "var(--acc2)",
+  supervisao_documental: "var(--prp2)",
+  supervisao_presencial: "var(--grn2)",
+  renovacao: "var(--amb2)",
+  mudanca_nivel: "var(--red2)",
 };
 
-export const CONC_TONE_BG: Record<Conclusao, string> = {
-  Aprovado: "bg-grn3",
-  "Aprovado com ressalvas": "bg-amb3",
-  Reprovado: "bg-red3",
-};
-
-export const CONC_TONE_TX: Record<Conclusao, string> = {
-  Aprovado: "text-grn2",
-  "Aprovado com ressalvas": "text-amb2",
-  Reprovado: "text-red2",
-};
-
-/* -------------------------------------------------------------------------- */
-/* Modal "Registrar Auditoria" (portado de abrirNovaAuditoria/confirmar)       */
-/* -------------------------------------------------------------------------- */
-
-export const TIPOS_AUDITORIA: TipoAuditoria[] = [
-  "Auditoria Inicial",
-  "Pré-Auditoria",
-  "Supervisão Documental",
-  "Supervisão Presencial",
-  "Renovação",
-  "Mudança de Nível",
-];
-
-export const MODALIDADES: Modalidade[] = ["Presencial", "Remota", "Híbrida"];
-
-export const CONCLUSOES: Conclusao[] = ["Aprovado", "Aprovado com ressalvas", "Reprovado"];
-
-export const NIVEIS = ["I", "II", "III", "IV"] as const;
-
-export interface NovaAuditoriaInput {
-  tipo: TipoAuditoria;
-  data: string;
-  empresa: string;
-  auditor: string;
-  modalidade: Modalidade;
-  duracao: string;
-  nivelAuditado: "I" | "II" | "III" | "IV";
-  nivelRecomendado: "I" | "II" | "III" | "IV";
-  conclusao: Conclusao;
-  criticidades: number;
-  parecer: string;
-  obs: string;
-}
-
-export function montarAuditoria(
-  input: NovaAuditoriaInput,
-  existentes: Auditoria[],
-): Auditoria {
-  const n = existentes.length + 1;
-  return {
-    ...input,
-    id: `aud${String(n).padStart(3, "0")}`,
-    duracao: input.duracao || "—",
-    obs: input.obs || "",
-  };
+export function conclusaoTone(conclusao: string): string {
+  if (conclusao === "aprovado") return "bg-grn3 text-grn2";
+  if (conclusao === "aprovado_ressalvas") return "bg-amb3 text-amb2";
+  if (conclusao === "reprovado") return "bg-red3 text-red2";
+  return "bg-bg3 text-t3";
 }

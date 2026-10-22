@@ -21,7 +21,7 @@ export interface DocumentoAcao {
 
 export interface AcaoPlano {
   idAcao: number;
-  idCertificacao: number;
+  idAuditoria: string;
   idRequisito: number;
   idItem: number | null;
   req: string;
@@ -32,6 +32,7 @@ export interface AcaoPlano {
   unidadeId: string;
   setor: string;
   certificacao: string;
+  manual: string;
   nivel: string;
   prazo: string;
   dtEnvio: string | null;
