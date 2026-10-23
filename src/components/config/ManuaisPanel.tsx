@@ -39,7 +39,7 @@ export function ManuaisPanel({ podeEditar }: { podeEditar: boolean }) {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  const listaManuais = manuais.data;
+  const listaManuais = [...manuais.data].sort((a, b) => b.id_manual - a.id_manual);
   const listaReqs = requisitos.data;
 
   const porManual = new Map<number, { requisitos: number; itens: number }>();
@@ -86,15 +86,25 @@ export function ManuaisPanel({ podeEditar }: { podeEditar: boolean }) {
       setErro("Informe o nome do manual.");
       return;
     }
-    const promessa: Promise<unknown> = modal.registro
-      ? atualizarManual(modal.registro.id_manual, payload)
-      : criarManual(payload);
+    const salvamento = modal.registro
+      ? atualizarManual(modal.registro.id_manual, payload).then((salvo) => ({
+          salvo,
+          criado: false,
+        }))
+      : criarManual(payload).then((salvo) => ({ salvo, criado: true }));
 
-    promessa
-      .then(() => {
+    salvamento
+      .then(({ salvo, criado }) => {
+        manuais.setData((atuais) =>
+          [
+            salvo,
+            ...atuais.filter((manual) => manual.id_manual !== salvo.id_manual),
+          ].sort((a, b) => b.id_manual - a.id_manual),
+        );
         toast(edicao ? "Registro atualizado." : "Registro criado.", "ok");
         fecharModal();
-        recarregar();
+        requisitos.reload();
+        if (!criado) manuais.reload();
       })
       .catch((err: unknown) => {
         setErro(err instanceof ApiError ? err.message : "Falha ao salvar.");

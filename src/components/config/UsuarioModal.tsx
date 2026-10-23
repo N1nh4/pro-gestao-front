@@ -29,7 +29,7 @@ export function UsuarioModal({
 }: {
   usuario?: UsuarioDto | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (usuario: UsuarioDto) => void;
 }) {
   const { toast } = useToast();
   const edicao = Boolean(usuario);
@@ -76,9 +76,9 @@ export function UsuarioModal({
       : criarUsuario({ ...payload, perfil_id: perfisSel[0], senha });
 
     acao
-      .then(() => {
+      .then((salvo) => {
         toast(edicao ? "Usuário atualizado." : "Usuário criado.", "ok");
-        onSaved();
+        onSaved(salvo);
         onClose();
       })
       .catch((err: unknown) => {

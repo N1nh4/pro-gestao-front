@@ -20,7 +20,7 @@ export function UnidadesPanel({ podeEditar }: { podeEditar: boolean }) {
   function onSaved(salvo: UnidadeDto) {
     setData((prev) => {
       const existe = prev.some((u) => u.id === salvo.id);
-      return existe ? prev.map((u) => (u.id === salvo.id ? salvo : u)) : [...prev, salvo];
+      return existe ? prev.map((u) => (u.id === salvo.id ? salvo : u)) : [salvo, ...prev];
     });
   }
 

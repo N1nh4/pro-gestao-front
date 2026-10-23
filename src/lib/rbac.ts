@@ -16,6 +16,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     setor: "TODOS",
     nav: [
       "painel",
+      "plano-de-acao",
       "progestao",
       "diligencias",
       "certificacao",
@@ -33,7 +34,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Admin do Ente",
     badgeClass: "bg-acc3 text-acc2",
     setor: "TODOS",
-    nav: ["painel", "progestao", "diligencias", "certificacao", "certificacoes", "documentos", "config", "parametros"],
+    nav: ["painel", "plano-de-acao", "progestao", "diligencias", "certificacao", "certificacoes", "documentos", "config", "parametros"],
     cfgTabs: ["ente", "unidades", "certificacoes", "usuarios"],
   },
   op: {
@@ -43,7 +44,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Operacional",
     badgeClass: "bg-amb3 text-amb2",
     setor: "GEFIN",
-    nav: ["painel", "progestao", "certificacoes", "diligencias", "documentos"],
+    nav: ["painel", "plano-de-acao", "progestao", "diligencias", "documentos"],
     cfgTabs: [],
   },
   lv: {
@@ -53,7 +54,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
     label: "Leitura",
     badgeClass: "bg-bg3 text-t3",
     setor: null,
-    nav: ["painel", "progestao", "diligencias", "certificacao", "certificacoes", "documentos"],
+    nav: ["painel", "plano-de-acao", "progestao", "diligencias", "certificacao", "certificacoes", "documentos"],
     cfgTabs: [],
   },
 };
@@ -61,6 +62,7 @@ export const PERFIS: Record<PerfilId, Perfil> = {
 /** Ordem canônica de exibição no sidebar. */
 export const NAV_ORDER: NavId[] = [
   "painel",
+  "plano-de-acao",
   "progestao",
   "diligencias",
   "certificacao",
@@ -76,6 +78,7 @@ export const NAV_DEF: Record<NavId, NavDef> = {
   diligencias: { label: "Diligências", icon: "messages-square", badge: 2 },
   certificacao: { label: "Auditoria", icon: "shield-check" },
   certificacoes: { label: "Certificações", icon: "award" },
+  "plano-de-acao": { label: "Plano de Ação", icon: "list-checks" },
   documentos: { label: "Doc. Modelos", icon: "file-text" },
   config: { label: "Configurações", icon: "settings" },
   parametros: { label: "Parâmetros", icon: "sliders-horizontal" },
@@ -88,7 +91,7 @@ export const TITLES: Record<string, string> = {
   diligencias: "Diligências",
   certificacao: "Auditoria",
   certificacoes: "Certificações",
-  auditorias: "Auditoria",
+  "plano-de-acao": "Plano de Ação",
   documentos: "Documentos Modelos",
   config: "Configurações",
   manual: "Manuais",
@@ -97,6 +100,7 @@ export const TITLES: Record<string, string> = {
 
 /** Rótulo do botão de ação primária por tela. */
 export const PRIMARY_ACTIONS: Record<string, string> = {
+  certificacao: "Nova auditoria",
   certificacoes: "Nova certificação",
 };
 

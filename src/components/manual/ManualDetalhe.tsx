@@ -82,9 +82,9 @@ export function ManualDetalhe({ idManual }: { idManual: number }) {
   const [erro, setErro] = useState<string | null>(null);
 
   const listaManuais = manuais.data;
-  const listaReqs = requisitos.data;
+  const listaReqs = [...requisitos.data].sort((a, b) => b.id_requisito - a.id_requisito);
   const listaDims = dimensoes.data;
-  const listaItens = itens.data;
+  const listaItens = [...itens.data].sort((a, b) => b.id_item - a.id_item);
 
   const manual = listaManuais.find((m) => m.id_manual === idManual);
   const carregando =
@@ -205,8 +205,18 @@ export function ManualDetalhe({ idManual }: { idManual: number }) {
         return;
       }
       promessa = modal.registro
-        ? atualizarRequisito(modal.registro.id_requisito, payload)
-        : criarRequisito(payload);
+        ? atualizarRequisito(modal.registro.id_requisito, payload).then((salvo) => {
+            requisitos.setData((atuais) =>
+              [...atuais.map((requisito) => (requisito.id_requisito === salvo.id_requisito ? salvo : requisito))]
+                .sort((a, b) => b.id_requisito - a.id_requisito),
+            );
+          })
+        : criarRequisito(payload).then((salvo) => {
+            requisitos.setData((atuais) =>
+              [salvo, ...atuais.filter((requisito) => requisito.id_requisito !== salvo.id_requisito)]
+                .sort((a, b) => b.id_requisito - a.id_requisito),
+            );
+          });
     } else {
       const payload = {
         id_requisito: Number(form.id_requisito),
@@ -220,15 +230,32 @@ export function ManualDetalhe({ idManual }: { idManual: number }) {
         return;
       }
       promessa = modal.registro
-        ? atualizarItem(modal.registro.id_item, payload)
-        : criarItem(payload);
+        ? atualizarItem(modal.registro.id_item, payload).then((salvo) => {
+            itens.setData((atuais) =>
+              [salvo, ...atuais.filter((item) => item.id_item !== salvo.id_item)]
+                .sort((a, b) => b.id_item - a.id_item),
+            );
+          })
+        : criarItem(payload).then((salvo) => {
+            itens.setData((atuais) =>
+              [salvo, ...atuais.filter((item) => item.id_item !== salvo.id_item)]
+                .sort((a, b) => b.id_item - a.id_item),
+            );
+            requisitos.setData((atuais) =>
+              atuais.map((requisito) =>
+                requisito.id_requisito === salvo.id_requisito
+                  ? { ...requisito, total_itens: requisito.total_itens + 1 }
+                  : requisito,
+              ),
+            );
+          });
     }
 
     promessa
       .then(() => {
         toast(edicao ? "Registro atualizado." : "Registro criado.", "ok");
         fecharModal();
-        recarregar();
+        if (edicao) recarregar();
       })
       .catch((err: unknown) => {
         setErro(err instanceof ApiError ? err.message : "Falha ao salvar.");
@@ -371,9 +398,7 @@ export function ManualDetalhe({ idManual }: { idManual: number }) {
                     {g.reqs.map((r) => {
                       const aberto = reqAberto === r.id_requisito;
                       const itensDoReq = aberto
-                        ? listaItens.filter(
-                            (i) => i.id_requisito === r.id_requisito,
-                          )
+                        ? listaItens.filter((i) => i.id_requisito === r.id_requisito)
                         : [];
                       return (
                         <div

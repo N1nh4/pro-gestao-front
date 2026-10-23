@@ -10,7 +10,7 @@ import { listarUsuarios, type UsuarioDto } from "@/lib/api/admin";
 import { useApiResource } from "@/lib/useApiResource";
 
 export function UsuariosPanel({ podeEditar }: { podeEditar: boolean }) {
-  const { data, loading, offline, error, reload } = useApiResource<UsuarioDto[]>(
+  const { data, setData, loading, offline, error, reload } = useApiResource<UsuarioDto[]>(
     "usuarios",
     listarUsuarios,
     [],
@@ -18,6 +18,28 @@ export function UsuariosPanel({ podeEditar }: { podeEditar: boolean }) {
   const [modal, setModal] = useState<{ aberto: boolean; usuario?: UsuarioDto | null }>(
     { aberto: false },
   );
+  const [usuarioRecemCriado, setUsuarioRecemCriado] = useState<string | null>(null);
+  const usuariosOrdenados = [...data].sort((a, b) => {
+    if (a.id === usuarioRecemCriado) return -1;
+    if (b.id === usuarioRecemCriado) return 1;
+    const dataA = a.criado_em ? Date.parse(a.criado_em) : 0;
+    const dataB = b.criado_em ? Date.parse(b.criado_em) : 0;
+    const diferenca = (Number.isNaN(dataB) ? 0 : dataB) - (Number.isNaN(dataA) ? 0 : dataA);
+    return diferenca || b.id.localeCompare(a.id);
+  });
+
+  function onSaved(salvo: UsuarioDto) {
+    setUsuarioRecemCriado(salvo.id);
+    setData((atuais) =>
+      [salvo, ...atuais.filter((usuario) => usuario.id !== salvo.id)].sort((a, b) => {
+        const dataA = a.criado_em ? Date.parse(a.criado_em) : 0;
+        const dataB = b.criado_em ? Date.parse(b.criado_em) : 0;
+        const diferenca =
+          (Number.isNaN(dataB) ? 0 : dataB) - (Number.isNaN(dataA) ? 0 : dataA);
+        return diferenca || b.id.localeCompare(a.id);
+      }),
+    );
+  }
 
   return (
     <Card>
@@ -62,7 +84,7 @@ export function UsuariosPanel({ podeEditar }: { podeEditar: boolean }) {
         <div className="py-4 text-center text-[11px] text-t3">Nenhum usuário cadastrado.</div>
       ) : (
         <div className="flex flex-col gap-1.5">
-          {data.map((u) => (
+          {usuariosOrdenados.map((u) => (
             <div
               key={u.id}
               className="flex items-center gap-2 rounded border border-brd bg-bg2 px-2 py-1.5 text-[11px]"
@@ -104,7 +126,7 @@ export function UsuariosPanel({ podeEditar }: { podeEditar: boolean }) {
         <UsuarioModal
           usuario={modal.usuario}
           onClose={() => setModal({ aberto: false })}
-          onSaved={reload}
+          onSaved={onSaved}
         />
       ) : null}
     </Card>

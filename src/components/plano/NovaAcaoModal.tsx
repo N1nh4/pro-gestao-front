@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
 import { cn } from "@/lib/cn";
 import { listarItens, type ItemDto, type NivelItem, type RequisitoOpcao } from "@/lib/api/catalogo";
+import type { AuditoriaDto } from "@/lib/api/certificacoes";
 import type { UnidadeDto } from "@/lib/api/admin";
 import { type NovaAcaoInput } from "@/lib/domain/plano";
 
@@ -13,19 +14,28 @@ const campo =
 
 export function NovaAcaoModal({
   requisitos,
+  requisitosPorManual,
   unidades,
+  auditorias,
+  idAuditoriaInicial,
   nivel,
   onClose,
   onCriar,
 }: {
   requisitos: RequisitoOpcao[];
+  requisitosPorManual?: ReadonlyMap<number, RequisitoOpcao[]>;
   unidades: UnidadeDto[];
+  auditorias?: AuditoriaDto[];
+  idAuditoriaInicial?: string;
   nivel?: NivelItem;
   onClose: () => void;
-  onCriar: (input: NovaAcaoInput) => Promise<void> | void;
+  onCriar: (input: NovaAcaoInput, idAuditoria: string) => Promise<void> | void;
 }) {
   const { toast } = useToast();
+  const [idCertificacao, setIdCertificacao] = useState("");
+  const [idAuditoria, setIdAuditoria] = useState(idAuditoriaInicial ?? "");
   const [idRequisito, setIdRequisito] = useState<string>("");
+  const [requisitoAberto, setRequisitoAberto] = useState(false);
   const [prazo, setPrazo] = useState("");
   const [idItem, setIdItem] = useState<string>("");
   const [nome, setNome] = useState("");
@@ -34,7 +44,20 @@ export function NovaAcaoModal({
   const [itensPorReq, setItensPorReq] = useState<{ id: number; itens: ItemDto[] } | null>(null);
   const [salvando, setSalvando] = useState(false);
 
-  const requisito = requisitos.find((r) => String(r.id_requisito) === idRequisito);
+  const certificacoesDisponiveis = auditorias
+    ? Array.from(
+        new Map(
+          auditorias.map((item) => [item.id_certificacao, item.nome_certificacao]),
+        ),
+      ).sort((a, b) => a[1].localeCompare(b[1]))
+    : [];
+  const auditoriasDaCertificacao =
+    auditorias?.filter((item) => String(item.id_certificacao) === idCertificacao) ?? [];
+  const auditoria = auditorias?.find((item) => item.id === idAuditoria);
+  const requisitosDisponiveis = auditorias
+    ? (auditoria && requisitosPorManual?.get(auditoria.id_manual)) ?? []
+    : requisitos;
+  const requisito = requisitosDisponiveis.find((r) => String(r.id_requisito) === idRequisito);
   const itens = itensPorReq?.id === Number(idRequisito) ? itensPorReq.itens : [];
 
   // Itens reais do requisito selecionado (catálogo, por ID).
@@ -59,6 +82,7 @@ export function NovaAcaoModal({
   }
 
   async function confirmar() {
+    if (!idAuditoria) return toast("Selecione a auditoria", "warn");
     if (!requisito) return toast("Selecione o requisito", "warn");
     if (!idItem) return toast("Selecione o item", "warn");
     if (!nome.trim()) return toast("Informe o nome da ação", "warn");
@@ -75,7 +99,7 @@ export function NovaAcaoModal({
         nome: nome.trim(),
         descricao: descricao.trim(),
         unidadeIds: unidadesSel,
-      });
+      }, idAuditoria);
       onClose();
     } catch {
       toast("Não foi possível criar a ação", "err");
@@ -104,25 +128,103 @@ export function NovaAcaoModal({
           </button>
         </div>
 
-        <div className="space-y-3 p-4">
+        <div className="max-h-[calc(100vh-8rem)] space-y-3 overflow-y-auto p-4">
+          {auditorias ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label className="block text-[10px] font-semibold text-t2">
+                Certificação
+                <select
+                  value={idCertificacao}
+                  onChange={(e) => {
+                    setIdCertificacao(e.target.value);
+                    setIdAuditoria("");
+                    setIdRequisito("");
+                    setIdItem("");
+                  }}
+                  className={cn(campo, "mt-1")}
+                >
+                  <option value="">— Selecione a certificação —</option>
+                  {certificacoesDisponiveis.map(([id, nome]) => (
+                    <option key={id} value={id}>
+                      {nome}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-[10px] font-semibold text-t2">
+                Auditoria
+                <select
+                  value={idAuditoria}
+                  disabled={!idCertificacao}
+                  onChange={(e) => {
+                    setIdAuditoria(e.target.value);
+                    setIdRequisito("");
+                    setIdItem("");
+                  }}
+                  className={cn(campo, "mt-1")}
+                >
+                  <option value="">
+                    {idCertificacao ? "— Selecione a auditoria —" : "— Selecione a certificação primeiro —"}
+                  </option>
+                  {auditoriasDaCertificacao.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.nome_manual} · {item.data_auditoria}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : null}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block text-[10px] font-semibold text-t2">
               Requisito
-              <select
-                value={idRequisito}
-                onChange={(e) => {
-                  setIdRequisito(e.target.value);
-                  setIdItem("");
-                }}
-                className={cn(campo, "mt-1")}
-              >
-                <option value="">— Selecione —</option>
-                {requisitos.map((r) => (
-                  <option key={r.id_requisito} value={r.id_requisito}>
-                    {r.rotulo}
-                  </option>
-                ))}
-              </select>
+              <div className="relative mt-1">
+                <button
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={requisitoAberto}
+                  onClick={() => setRequisitoAberto((aberto) => !aberto)}
+                  className={cn(campo, "flex min-w-0 items-center justify-between gap-2 text-left")}
+                >
+                  <span className="min-w-0 break-words whitespace-normal">
+                    {requisitosDisponiveis.find((r) => String(r.id_requisito) === idRequisito)
+                      ?.rotulo ?? "— Selecione —"}
+                  </span>
+                  <ChevronDown className="size-3 shrink-0 text-t3" aria-hidden="true" />
+                </button>
+                {requisitoAberto ? (
+                  <div
+                    role="listbox"
+                    aria-label="Requisitos"
+                    className="absolute inset-x-0 top-full z-30 mt-1 max-h-48 overflow-y-auto rounded border border-brd2 bg-bg1 shadow-lg"
+                  >
+                    {requisitosDisponiveis.length ? (
+                      requisitosDisponiveis.map((r) => (
+                        <button
+                          key={r.id_requisito}
+                          type="button"
+                          role="option"
+                          aria-selected={String(r.id_requisito) === idRequisito}
+                          onClick={() => {
+                            setIdRequisito(String(r.id_requisito));
+                            setIdItem("");
+                            setRequisitoAberto(false);
+                          }}
+                          className="block w-full cursor-pointer px-2.5 py-2 text-left text-[11px] leading-relaxed text-t1 whitespace-normal break-words hover:bg-bg3"
+                        >
+                          {r.rotulo}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-2.5 py-2 text-[11px] text-t3">
+                        {auditorias && !idAuditoria
+                          ? "Selecione uma auditoria primeiro."
+                          : "Nenhum requisito disponível."}
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
             </label>
             <label className="block text-[10px] font-semibold text-t2">
               Item do requisito
@@ -155,7 +257,7 @@ export function NovaAcaoModal({
               />
             </label>
             <label className="block text-[10px] font-semibold text-t2">
-              Nome da ação
+              Ação
               <input
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}

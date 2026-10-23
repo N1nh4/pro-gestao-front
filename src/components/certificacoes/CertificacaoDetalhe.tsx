@@ -38,6 +38,7 @@ export function CertificacaoDetalhe({ idCertificacao }: { idCertificacao: number
   const idValido = Number.isSafeInteger(idCertificacao) && idCertificacao > 0;
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState<AuditoriaDto | null>(null);
+  const [auditoriaRecemCriada, setAuditoriaRecemCriada] = useState<string | null>(null);
 
   const certResource = useApiResource<CertificacaoDto | null>(
     `certificacao-${idCertificacao}`,
@@ -55,7 +56,15 @@ export function CertificacaoDetalhe({ idCertificacao }: { idCertificacao: number
   const manuaisResource = useApiResource<ManualDto[]>("manuais", listarManuais, []);
   const niveisResource = useApiResource<NivelDto[]>("niveis", listarNiveis, []);
   const certificacao = certResource.data;
-  const auditorias = audsResource.data;
+  const auditorias = [...audsResource.data].sort(
+    (a, b) =>
+      (a.id === auditoriaRecemCriada
+        ? -1
+        : b.id === auditoriaRecemCriada
+          ? 1
+          : (Date.parse(b.criado_em ?? "") || Date.parse(b.data_auditoria)) -
+            (Date.parse(a.criado_em ?? "") || Date.parse(a.data_auditoria))),
+  );
   const isAdmin = perfil?.id === "ag" || perfil?.id === "sa";
 
   useEffect(() => {
@@ -68,14 +77,28 @@ export function CertificacaoDetalhe({ idCertificacao }: { idCertificacao: number
 
   async function salvar(payload: AuditoriaPayload) {
     if (editando) {
-      await atualizarAuditoria(editando.id, payload);
+      const salva = await atualizarAuditoria(editando.id, payload);
+      audsResource.setData((atuais) =>
+        atuais.map((item) => (item.id === salva.id ? salva : item)),
+      );
       toast("Auditoria atualizada", "ok");
     } else {
-      await criarAuditoria(payload);
+      const criada = await criarAuditoria(payload);
+      setAuditoriaRecemCriada(criada.id);
+      audsResource.setData((atuais) =>
+        [criada, ...atuais.filter((item) => item.id !== criada.id)].sort(
+          (a, b) =>
+            (Date.parse(b.criado_em ?? "") || Date.parse(b.data_auditoria)) -
+            (Date.parse(a.criado_em ?? "") || Date.parse(a.data_auditoria)),
+        ),
+      );
+      certResource.setData((atual) =>
+        atual
+          ? { ...atual, auditorias_count: atual.auditorias_count + 1 }
+          : atual,
+      );
       toast("Auditoria criada", "ok");
     }
-    audsResource.reload();
-    certResource.reload();
   }
 
   async function remover(auditoria: AuditoriaDto) {
@@ -215,7 +238,7 @@ export function CertificacaoDetalhe({ idCertificacao }: { idCertificacao: number
                     <div className="mt-2 flex justify-end gap-1 border-t border-brd pt-2">
                       <button
                         type="button"
-                        onClick={() => router.push(`/auditorias/${auditoria.id}`)}
+                        onClick={() => router.push(`/plano-de-acao/${auditoria.id}`)}
                         title="Abrir plano de ação"
                         aria-label={`Abrir plano da auditoria de ${formatarData(auditoria.data_auditoria)}`}
                         className="cursor-pointer rounded p-1.5 text-t3 transition-colors hover:bg-bg3 hover:text-acc2"

@@ -15,7 +15,6 @@ import {
   type CertificacaoDto,
   type CertificacaoPayload,
 } from "@/lib/api/certificacoes";
-import { setPrimaryAction } from "@/lib/primaryAction";
 import { useApiResource } from "@/lib/useApiResource";
 
 function formatarData(data: string | null) {
@@ -38,15 +37,24 @@ export default function CertificacoesPage() {
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState<CertificacaoDto | null>(null);
   const resource = useApiResource<CertificacaoDto[]>("certificacoes", listarCertificacoes, []);
+  const certificacoesOrdenadas = [...resource.data].sort((a, b) => {
+    const dataA = a.criado_em ? Date.parse(a.criado_em) : 0;
+    const dataB = b.criado_em ? Date.parse(b.criado_em) : 0;
+    const diferenca =
+      (Number.isNaN(dataB) ? 0 : dataB) - (Number.isNaN(dataA) ? 0 : dataA);
+    return diferenca || b.id_certificacao - a.id_certificacao;
+  });
   const isAdmin = perfil?.id === "ag" || perfil?.id === "sa";
 
   useEffect(() => {
-    if (!isAdmin) return;
-    return setPrimaryAction(() => {
-      setEditando(null);
-      setModalAberto(true);
-    });
-  }, [isAdmin]);
+    if (isAdmin) {
+      router.replace("/config?tab=certificacoes");
+    }
+  }, [isAdmin, router]);
+
+  if (isAdmin) {
+    return <div className="py-10 text-center text-[11px] text-t3">Abrindo certificações…</div>;
+  }
 
   async function salvar(payload: CertificacaoPayload) {
     if (editando) {
@@ -89,9 +97,9 @@ export default function CertificacoesPage() {
 
       {resource.loading ? (
         <div className="py-10 text-center text-[11px] text-t3">Carregando certificações…</div>
-      ) : resource.data.length ? (
+      ) : certificacoesOrdenadas.length ? (
         <div className="mt-3 grid gap-3 md:grid-cols-2">
-          {resource.data.map((certificacao) => {
+        {certificacoesOrdenadas.map((certificacao) => {
             const visual = STATUS[certificacao.status] ?? {
               pill: "bg-bg3 text-t3",
               barra: "bg-brd2",

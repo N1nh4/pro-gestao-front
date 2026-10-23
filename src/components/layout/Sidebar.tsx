@@ -43,7 +43,11 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto overflow-x-hidden py-1">
-        {perfil.nav.map((id) => {
+        {perfil.nav
+          .filter(
+            (id) => !(id === "certificacoes" && perfil.cfgTabs.includes("certificacoes")),
+          )
+          .map((id) => {
           const def = NAV_DEF[id];
           const Icon = NAV_ICONS[def.icon];
           const href = pathForNav(id);
@@ -71,7 +75,7 @@ export function Sidebar() {
               ) : null}
             </Link>
           );
-        })}
+          })}
       </nav>
 
       <div className="border-t border-brd p-2">

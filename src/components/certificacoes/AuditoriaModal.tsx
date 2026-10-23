@@ -11,20 +11,26 @@ import {
   TIPO_OPCOES,
   rotulo,
 } from "@/lib/domain/auditorias";
-import { type AuditoriaDto, type AuditoriaPayload } from "@/lib/api/certificacoes";
+import {
+  type AuditoriaDto,
+  type AuditoriaPayload,
+  type CertificacaoDto,
+} from "@/lib/api/certificacoes";
 
 const campo =
   "w-full rounded border border-brd2 bg-bg2 px-2.5 py-[6px] text-[11px] text-t1 placeholder:text-t4 focus:outline-none";
 
 export function AuditoriaModal({
   idCertificacao,
+  certificacoes,
   auditoria,
   manuais,
   niveis,
   onClose,
   onSalvar,
 }: {
-  idCertificacao: number;
+  idCertificacao?: number;
+  certificacoes?: CertificacaoDto[];
   /** null = nova auditoria. */
   auditoria: AuditoriaDto | null;
   manuais: ManualDto[];
@@ -34,6 +40,9 @@ export function AuditoriaModal({
 }) {
   const { toast } = useToast();
   const escopoBloqueado = Boolean(auditoria && auditoria.acoes_count > 0);
+  const [certificacaoSelecionada, setCertificacaoSelecionada] = useState(
+    idCertificacao ? String(idCertificacao) : "",
+  );
   const [idManual, setIdManual] = useState(auditoria ? String(auditoria.id_manual) : "");
   const [tipo, setTipo] = useState(auditoria?.tipo ?? "pre_auditoria");
   const [modalidade, setModalidade] = useState(auditoria?.modalidade ?? "presencial");
@@ -49,13 +58,16 @@ export function AuditoriaModal({
   const [salvando, setSalvando] = useState(false);
 
   async function confirmar() {
+    const idCertificacaoFinal = Number(certificacaoSelecionada);
+    if (!Number.isSafeInteger(idCertificacaoFinal) || idCertificacaoFinal <= 0)
+      return toast("Selecione a certificação", "warn");
     if (!idManual) return toast("Selecione o manual", "warn");
     if (!data) return toast("Informe a data da auditoria", "warn");
 
     setSalvando(true);
     try {
       await onSalvar({
-        id_certificacao: idCertificacao,
+        id_certificacao: idCertificacaoFinal,
         id_manual: Number(idManual),
         tipo,
         modalidade,
@@ -98,6 +110,23 @@ export function AuditoriaModal({
         </div>
 
         <div className="space-y-3 p-4">
+          {certificacoes ? (
+            <label className="block text-[10px] font-semibold text-t2">
+              Certificação
+              <select
+                value={certificacaoSelecionada}
+                onChange={(e) => setCertificacaoSelecionada(e.target.value)}
+                className={cn(campo, "mt-1")}
+              >
+                <option value="">— Selecione —</option>
+                {certificacoes.map((certificacao) => (
+                  <option key={certificacao.id_certificacao} value={certificacao.id_certificacao}>
+                    {certificacao.nome_certificacao}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block text-[10px] font-semibold text-t2">
               Manual
@@ -111,6 +140,21 @@ export function AuditoriaModal({
                 {manuais.map((m) => (
                   <option key={m.id_manual} value={m.id_manual}>
                     {m.nome_manual} (v{m.versao_manual})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-[10px] font-semibold text-t2">
+              Nível
+              <select
+                value={nivelRecomendado}
+                onChange={(e) => setNivelRecomendado(e.target.value)}
+                className={cn(campo, "mt-1")}
+              >
+                <option value="">—</option>
+                {niveis.map((n) => (
+                  <option key={n.id_nivel} value={n.nome_nivel}>
+                    {rotulo(n.nome_nivel)}
                   </option>
                 ))}
               </select>
@@ -162,7 +206,7 @@ export function AuditoriaModal({
             </label>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block text-[10px] font-semibold text-t2">
               Duração (h)
               <input
@@ -184,21 +228,6 @@ export function AuditoriaModal({
                 {CONCLUSAO_OPCOES.map((c) => (
                   <option key={c.valor} value={c.valor}>
                     {c.rotulo}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-[10px] font-semibold text-t2">
-              Nível recomendado
-              <select
-                value={nivelRecomendado}
-                onChange={(e) => setNivelRecomendado(e.target.value)}
-                className={cn(campo, "mt-1")}
-              >
-                <option value="">—</option>
-                {niveis.map((n) => (
-                  <option key={n.id_nivel} value={n.nome_nivel}>
-                    {rotulo(n.nome_nivel)}
                   </option>
                 ))}
               </select>

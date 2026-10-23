@@ -58,11 +58,13 @@ export default function DiligenciasPage() {
 
   const data = useMemo(
     () =>
-      items.filter((d) => {
-        if (st && d.status !== st) return false;
-        if (crit && d.criticidade !== crit) return false;
-        return true;
-      }),
+      items
+        .filter((d) => {
+          if (st && d.status !== st) return false;
+          if (crit && d.criticidade !== crit) return false;
+          return true;
+        })
+        .sort((a, b) => Number.parseInt(b.num, 10) - Number.parseInt(a.num, 10)),
     [items, st, crit],
   );
 

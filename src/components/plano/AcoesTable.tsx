@@ -7,6 +7,7 @@ import {
   ChevronRight,
   CloudUpload,
   Download,
+  ExternalLink,
   FileText,
   Pencil,
   Send,
@@ -35,6 +36,8 @@ const STATUS_COR: Record<string, { bg: string; txt: string }> = {
   APROVADO: { bg: "bg-grn3", txt: "text-grn2" },
   DILIGÊNCIA: { bg: "bg-red3", txt: "text-red2" },
 };
+
+const COLUNAS_ACAO = "grid-cols-[70px_120px_minmax(180px,1fr)_90px_110px_90px_80px_72px]";
 
 function isVencida(a: A) {
   if (!a.prazo) return false;
@@ -164,6 +167,28 @@ function DetalheAcao({
     } catch (error) {
       toast(
         error instanceof Error ? error.message : "Não foi possível baixar o documento",
+        "err",
+      );
+    }
+  }
+
+  async function abrirDocumento(id: string, nome: string) {
+    const aba = window.open("about:blank", "_blank");
+    if (!aba) {
+      toast("Permita pop-ups para abrir a comprovação em outra aba.", "warn");
+      return;
+    }
+    aba.opener = null;
+
+    try {
+      const blob = await baixarDocumentoAcao(acao.idAcao, id);
+      const url = URL.createObjectURL(blob);
+      aba.location.href = url;
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (error) {
+      aba.close();
+      toast(
+        error instanceof Error ? error.message : `Não foi possível abrir ${nome}`,
         "err",
       );
     }
@@ -401,6 +426,15 @@ function DetalheAcao({
                   ) : null}
                   <button
                     type="button"
+                    onClick={() => abrirDocumento(documento.id, documento.nomeArquivo)}
+                    title={`Abrir ${documento.nomeArquivo} em outra aba`}
+                    aria-label={`Abrir ${documento.nomeArquivo} em outra aba`}
+                    className="shrink-0 cursor-pointer rounded p-1 text-t3 hover:bg-bg3 hover:text-t1"
+                  >
+                    <ExternalLink className="size-3" />
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => baixarDocumento(documento.id, documento.nomeArquivo)}
                     title={`Baixar ${documento.nomeArquivo}`}
                     aria-label={`Baixar ${documento.nomeArquivo}`}
@@ -458,7 +492,7 @@ function LinhaAcao({
     <div className="border-t border-brd">
       <div
         onClick={() => setExpandida((aberta) => !aberta)}
-        className="grid cursor-pointer grid-cols-[70px_120px_1fr_80px_100px_80px_80px_60px] items-center gap-0 px-3 py-2 transition-colors hover:bg-bg2"
+        className={`grid cursor-pointer ${COLUNAS_ACAO} items-start gap-0 px-3 py-2 transition-colors hover:bg-bg2`}
       >
         <div className="font-mono text-[9px] font-bold text-acc2">
           #{acao.idAcao}
@@ -468,22 +502,15 @@ function LinhaAcao({
         </div>
         <div className="min-w-0 break-words whitespace-normal pr-2 text-[10px] text-t1">
           {acao.nome || acao.acao || "—"}
-          {diligencias.length ? (
-            <span className="ml-1 rounded bg-red3 px-1 text-[8px] font-bold text-red2">
-              D
-            </span>
-          ) : null}
         </div>
         <div className="min-w-0 break-words whitespace-normal text-[9px] font-semibold text-t2">
           {unidade || "—"}
         </div>
-        <div>
-          <span
-            className={`rounded px-2 py-0.5 text-[9px] font-bold ${status.bg} ${status.txt}`}
-          >
-            {acao.status}
-          </span>
-        </div>
+        <span
+          className={`w-fit rounded px-2 py-0.5 text-[9px] font-bold ${status.bg} ${status.txt}`}
+        >
+          {acao.status}
+        </span>
         <div
           className={`text-[10px] font-semibold ${vencida ? "text-red2" : "text-t2"}`}
         >
@@ -556,6 +583,7 @@ function LinhaAcao({
 
 export function AcoesTable({
   acoes,
+  abrirRequisito,
   unidades = [],
   diligencias = [],
   requisitos = [],
@@ -569,6 +597,7 @@ export function AcoesTable({
   onEmitirDiligencia,
 }: {
   acoes: A[];
+  abrirRequisito?: { id: number; sequencia: number } | null;
   unidades?: { id: string; sigla: string }[];
   diligencias?: Diligencia[];
   requisitos?: RequisitoOpcao[];
@@ -589,12 +618,14 @@ export function AcoesTable({
   ) => Promise<void>;
 }) {
   // O Operador já recebe apenas as ações das suas unidades (filtro no backend).
-  const data = acoes;
+  const data = [...acoes].sort((a, b) => b.idAcao - a.idAcao);
   const nomeReq = (id: number) =>
     requisitos.find((r) => r.id_requisito === id)?.nome_requisito ?? "";
   const siglaUnidade = (id: string) =>
     unidades.find((u) => u.id === id)?.sigla ?? "";
-  const [requisitoAberto, setRequisitoAberto] = useState<number | null>(null);
+  const [requisitoAberto, setRequisitoAberto] = useState<number | null>(
+    abrirRequisito?.id ?? null,
+  );
   const grupos = Array.from(
     data
       .reduce((map, acao) => {
@@ -650,7 +681,7 @@ export function AcoesTable({
                 {grupo.nome || "Requisito sem nome"}
               </span>
               <span className="text-[9px] text-t3">
-                {grupo.acoes.length} ação{grupo.acoes.length === 1 ? "" : "ões"}
+                {grupo.acoes.length} {grupo.acoes.length === 1 ? "ação" : "ações"}
               </span>
               <span className="text-[10px] font-bold text-acc2">
                 {progresso}%
@@ -663,7 +694,7 @@ export function AcoesTable({
             {aberto ? (
               <div className="overflow-x-auto border-t border-brd">
                 <div className="min-w-[820px]">
-                  <div className="grid grid-cols-[70px_120px_1fr_80px_100px_80px_80px_60px] gap-0 bg-bg3 px-3 py-1.5 text-[8px] font-bold uppercase tracking-wide text-t3">
+                  <div className={`grid ${COLUNAS_ACAO} items-center gap-0 bg-bg3 px-3 py-1.5 text-[8px] font-bold uppercase tracking-wide text-t3`}>
                     <div>ID AÇÃO</div>
                     <div>ITEM</div>
                     <div>AÇÃO</div>
