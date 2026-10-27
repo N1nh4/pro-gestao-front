@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     isAdmin && segment === "certificacoes" && pathname !== "/certificacoes"
       ? "Nova auditoria"
       : isAdmin && segment === "plano-de-acao"
-        ? "Nova ação"
+        ? undefined
         : isAdmin
           ? PRIMARY_ACTIONS[segment]
           : undefined;

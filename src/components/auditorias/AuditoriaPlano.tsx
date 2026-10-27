@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Download, FileText } from "lucide-react";
+import { ArrowLeft, Download, FileText, Plus } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -126,14 +126,8 @@ export function AuditoriaPlano({ idAuditoria }: { idAuditoria?: string }) {
 
   useEffect(() => {
     if (!isAdmin) return;
-    return setPrimaryAction(() => {
-      if (idAuditoria && !auditoria) {
-        toast("A auditoria ainda não foi carregada.", "warn");
-        return;
-      }
-      setNovaAberta(true);
-    });
-  }, [isAdmin, idAuditoria, auditoria, toast]);
+    return setPrimaryAction(() => undefined);
+  }, [isAdmin]);
 
   const unidadesPlano = useMemo(
     () => Array.from(new Set(acoes.map((a) => a.setor).filter(Boolean))).sort(),
@@ -265,39 +259,48 @@ export function AuditoriaPlano({ idAuditoria }: { idAuditoria?: string }) {
         </Alert>
       ) : null}
 
-      <Alert
-        variant="info"
-        title={
-          auditoria
-            ? `${auditoria.nome_certificacao} — ${rotulo(auditoria.tipo)}`
-            : "Plano de Ação"
-        }
-        action={
-          <div className="flex gap-1">
-            {auditoria ? (
-              <Button
-                onClick={() => router.push(`/certificacoes/${auditoria.id_certificacao}`)}
-                className="h-6 px-2 text-[10px]"
-              >
-                <ArrowLeft className="size-3" />
-                Auditorias
-              </Button>
-            ) : null}
-            {isAdmin ? (
-              <Button onClick={() => router.push("/progestao")} className="h-6 px-2 text-[10px]">
-                <FileText className="size-3" />
-                Diagnóstico
-              </Button>
-            ) : null}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-1 flex-col">
+          <div className="text-[13px] font-bold text-t1">
+            {auditoria
+              ? `${auditoria.nome_certificacao} — ${rotulo(auditoria.tipo)}`
+              : "Plano de Ação"}
           </div>
-        }
-      >
-        {idAuditoria && auditoriaResource.loading
-          ? "Carregando auditoria…"
-          : auditoria
-            ? `${auditoria.nome_manual} · v${auditoria.versao_manual} · ${rotulo(auditoria.modalidade)} · ${auditoria.data_auditoria}. As ações abaixo pertencem a esta auditoria.`
-            : "Todas as ações cadastradas nas auditorias do ente."}
-      </Alert>
+          {idAuditoria && auditoriaResource.loading ? (
+            <span className="text-[10px] text-t3">Carregando auditoria…</span>
+          ) : auditoria ? (
+            <span className="text-[10px] text-t3">
+              {auditoria.nome_manual} · v{auditoria.versao_manual} · {rotulo(auditoria.modalidade)} · {auditoria.data_auditoria}. As ações abaixo pertencem a esta auditoria.
+            </span>
+          ) : null}
+        </div>
+        <div className="flex gap-1.5">
+          {auditoria ? (
+            <Button
+              onClick={() => router.push(`/certificacoes/${auditoria.id_certificacao}`)}
+              className="h-7 px-2.5 text-[11px]"
+            >
+              <ArrowLeft className="size-3" />
+              Auditorias
+            </Button>
+          ) : null}
+          {isAdmin ? (
+            <Button onClick={() => router.push("/progestao")} className="h-7 px-2.5 text-[11px]">
+              <FileText className="size-3" />
+              Diagnóstico
+            </Button>
+          ) : null}
+          {isAdmin && (!idAuditoria || auditoria) ? (
+            <Button
+              onClick={() => setNovaAberta(true)}
+              className="h-7 px-2.5 text-[11px] bg-acc hover:bg-acc2 text-white"
+            >
+              <Plus className="size-3.5" />
+              Nova ação
+            </Button>
+          ) : null}
+        </div>
+      </div>
 
       {idAuditoria && !auditoriaResource.loading && !auditoria ? (
         <Alert variant="warn" title="Auditoria indisponível" className="mt-2">
@@ -432,6 +435,7 @@ export function AuditoriaPlano({ idAuditoria }: { idAuditoria?: string }) {
             podeEditar={isAdmin}
             podeAuditar={isAdmin}
             podeEnviar={isOperacional}
+            agruparPorRequisito={false}
             onEditar={(a) => setEditando(a)}
             onRemover={remover}
             onAprovar={aprovarAcao}

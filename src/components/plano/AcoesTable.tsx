@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Check,
   ChevronDown,
@@ -37,7 +37,8 @@ const STATUS_COR: Record<string, { bg: string; txt: string }> = {
   DILIGÊNCIA: { bg: "bg-red3", txt: "text-red2" },
 };
 
-const COLUNAS_ACAO = "grid-cols-[70px_120px_minmax(180px,1fr)_90px_110px_90px_80px_72px]";
+const COLUNAS_ACAO =
+  "grid-cols-[70px_90px_100px_minmax(260px,1fr)_90px_110px_90px_80px_100px] gap-x-2";
 
 function isVencida(a: A) {
   if (!a.prazo) return false;
@@ -145,7 +146,9 @@ function DetalheAcao({
       setArquivo(null);
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : "Não foi possível enviar a comprovação",
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar a comprovação",
         "err",
       );
     } finally {
@@ -166,7 +169,9 @@ function DetalheAcao({
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (error) {
       toast(
-        error instanceof Error ? error.message : "Não foi possível baixar o documento",
+        error instanceof Error
+          ? error.message
+          : "Não foi possível baixar o documento",
         "err",
       );
     }
@@ -188,7 +193,9 @@ function DetalheAcao({
     } catch (error) {
       aba.close();
       toast(
-        error instanceof Error ? error.message : `Não foi possível abrir ${nome}`,
+        error instanceof Error
+          ? error.message
+          : `Não foi possível abrir ${nome}`,
         "err",
       );
     }
@@ -207,7 +214,8 @@ function DetalheAcao({
               <div className="flex flex-col gap-2">
                 {acao.status === "DILIGÊNCIA" ? (
                   <p className="rounded bg-red3 px-2 py-1.5 text-[9px] text-red2">
-                    Envie a correção solicitada para submeter novamente à análise.
+                    Envie a correção solicitada para submeter novamente à
+                    análise.
                   </p>
                 ) : null}
                 <label className="flex cursor-pointer flex-col items-center gap-1 rounded border border-dashed border-brd2 bg-bg2 px-3 py-3 text-center transition-colors hover:bg-bg3">
@@ -215,13 +223,17 @@ function DetalheAcao({
                   <span className="text-[10px] font-semibold text-t1">
                     {arquivo?.name ?? "Selecionar arquivo de comprovação"}
                   </span>
-                  <span className="text-[9px] text-t3">PDF, DOCX ou XLSX · máximo 20 MB</span>
+                  <span className="text-[9px] text-t3">
+                    PDF, DOCX ou XLSX · máximo 20 MB
+                  </span>
                   <input
                     key={arquivo?.name ?? "arquivo-vazio"}
                     type="file"
                     accept=".pdf,.docx,.xlsx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     className="sr-only"
-                    onChange={(event) => setArquivo(event.target.files?.[0] ?? null)}
+                    onChange={(event) =>
+                      setArquivo(event.target.files?.[0] ?? null)
+                    }
                   />
                 </label>
                 <div className="flex justify-end">
@@ -281,7 +293,8 @@ function DetalheAcao({
             </div>
             {acao.status === "PENDENTE" ? (
               <p className="mt-2 text-[9px] text-t3">
-                Aguardando envio da comprovação pelo Operacional para liberar a revisão.
+                Aguardando envio da comprovação pelo Operacional para liberar a
+                revisão.
               </p>
             ) : null}
             {acao.status === "APROVADO" ? (
@@ -421,12 +434,16 @@ function DetalheAcao({
                   </span>
                   {documento.enviadoEm ? (
                     <time className="shrink-0 text-[8px] text-t3">
-                      {new Date(documento.enviadoEm).toLocaleDateString("pt-BR")}
+                      {new Date(documento.enviadoEm).toLocaleDateString(
+                        "pt-BR",
+                      )}
                     </time>
                   ) : null}
                   <button
                     type="button"
-                    onClick={() => abrirDocumento(documento.id, documento.nomeArquivo)}
+                    onClick={() =>
+                      abrirDocumento(documento.id, documento.nomeArquivo)
+                    }
                     title={`Abrir ${documento.nomeArquivo} em outra aba`}
                     aria-label={`Abrir ${documento.nomeArquivo} em outra aba`}
                     className="shrink-0 cursor-pointer rounded p-1 text-t3 hover:bg-bg3 hover:text-t1"
@@ -435,7 +452,9 @@ function DetalheAcao({
                   </button>
                   <button
                     type="button"
-                    onClick={() => baixarDocumento(documento.id, documento.nomeArquivo)}
+                    onClick={() =>
+                      baixarDocumento(documento.id, documento.nomeArquivo)
+                    }
                     title={`Baixar ${documento.nomeArquivo}`}
                     aria-label={`Baixar ${documento.nomeArquivo}`}
                     className="shrink-0 cursor-pointer rounded p-1 text-t3 hover:bg-bg3 hover:text-t1"
@@ -459,6 +478,7 @@ function LinhaAcao({
   podeEditar,
   podeAuditar,
   podeEnviar,
+  mostrarRequisito = false,
   onEditar,
   onRemover,
   onAprovar,
@@ -471,6 +491,7 @@ function LinhaAcao({
   podeEditar: boolean;
   podeAuditar: boolean;
   podeEnviar: boolean;
+  mostrarRequisito?: boolean;
   onEditar?: (acao: A) => void;
   onRemover?: (acao: A) => void;
   onAprovar?: (acao: A) => Promise<void>;
@@ -497,6 +518,11 @@ function LinhaAcao({
         <div className="font-mono text-[9px] font-bold text-acc2">
           #{acao.idAcao}
         </div>
+        {mostrarRequisito ? (
+          <div className="min-w-0 break-words whitespace-normal text-[9px] font-semibold text-acc2">
+            {acao.req || "—"}
+          </div>
+        ) : null}
         <div className="min-w-0 break-words whitespace-normal text-[10px] font-semibold text-t2">
           {acao.item || "—"}
         </div>
@@ -590,6 +616,7 @@ export function AcoesTable({
   podeEditar = false,
   podeAuditar = false,
   podeEnviar = false,
+  agruparPorRequisito = true,
   onEditar,
   onRemover,
   onAprovar,
@@ -604,6 +631,7 @@ export function AcoesTable({
   podeEditar?: boolean;
   podeAuditar?: boolean;
   podeEnviar?: boolean;
+  agruparPorRequisito?: boolean;
   onEditar?: (acao: A) => void;
   onRemover?: (acao: A) => void;
   onAprovar?: (acao: A) => Promise<void>;
@@ -626,6 +654,20 @@ export function AcoesTable({
   const [requisitoAberto, setRequisitoAberto] = useState<number | null>(
     abrirRequisito?.id ?? null,
   );
+  const [pagina, setPagina] = useState(1);
+  const porPagina = 7;
+  useEffect(() => {
+    setPagina(1);
+  }, [agruparPorRequisito, acoes.length]);
+  const totalPaginas = useMemo(
+    () => Math.max(1, Math.ceil(data.length / porPagina)),
+    [data.length],
+  );
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const itensPaginados = useMemo(
+    () => data.slice((paginaAtual - 1) * porPagina, paginaAtual * porPagina),
+    [data, paginaAtual],
+  );
   const grupos = Array.from(
     data
       .reduce((map, acao) => {
@@ -646,6 +688,78 @@ export function AcoesTable({
     return (
       <div className="rounded-lg border border-brd bg-bg1 px-4 py-8 text-center text-[11px] text-t3">
         Nenhuma ação no plano.
+      </div>
+    );
+  }
+
+  if (!agruparPorRequisito) {
+    return (
+      <div className="overflow-hidden rounded-lg border border-brd bg-bg1">
+        <div className="overflow-x-auto">
+          <div className="min-w-[920px]">
+            <div
+              className={`grid ${COLUNAS_ACAO} items-center bg-bg3 px-3 py-1.5 text-[8px] font-bold uppercase tracking-wide text-t3`}
+            >
+              <div>ID AÇÃO</div>
+              <div>REQUISITO</div>
+              <div>ITEM</div>
+              <div>AÇÃO</div>
+              <div>UNIDADE</div>
+              <div>STATUS</div>
+              <div>PRAZO</div>
+              <div>ENVIO</div>
+              <div />
+            </div>
+            {itensPaginados.map((acao) => (
+              <LinhaAcao
+                key={acao.idAcao}
+                acao={acao}
+                unidade={acao.setor || siglaUnidade(acao.unidadeId)}
+                diligencias={diligencias.filter(
+                  (d) => d.acaoCod === acao.idAcao,
+                )}
+                podeEditar={podeEditar}
+                podeAuditar={podeAuditar}
+                podeEnviar={podeEnviar}
+                mostrarRequisito
+                onEditar={onEditar}
+                onRemover={onRemover}
+                onAprovar={onAprovar}
+                onEnviarDocumento={onEnviarDocumento}
+                onEmitirDiligencia={onEmitirDiligencia}
+              />
+            ))}
+          </div>
+        </div>
+        {totalPaginas > 1 ? (
+          <div className="flex items-center justify-between border-t border-brd px-3 py-2 text-[10px] text-t2">
+            <span>
+              Mostrando {(paginaAtual - 1) * porPagina + 1}-
+              {Math.min(paginaAtual * porPagina, data.length)} de {data.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                disabled={paginaAtual === 1}
+                onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                className="rounded px-2 py-1 hover:bg-bg2 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer border border-gray-100"
+              >
+                Anterior
+              </button>
+              <span className="px-2">
+                {paginaAtual} / {totalPaginas}
+              </span>
+              <button
+                type="button"
+                disabled={paginaAtual === totalPaginas}
+                onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                className="rounded px-2 py-1 hover:bg-bg2 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer border border-gray-100"
+              >
+                Próxima
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -681,7 +795,8 @@ export function AcoesTable({
                 {grupo.nome || "Requisito sem nome"}
               </span>
               <span className="text-[9px] text-t3">
-                {grupo.acoes.length} {grupo.acoes.length === 1 ? "ação" : "ações"}
+                {grupo.acoes.length}{" "}
+                {grupo.acoes.length === 1 ? "ação" : "ações"}
               </span>
               <span className="text-[10px] font-bold text-acc2">
                 {progresso}%
@@ -694,8 +809,11 @@ export function AcoesTable({
             {aberto ? (
               <div className="overflow-x-auto border-t border-brd">
                 <div className="min-w-[820px]">
-                  <div className={`grid ${COLUNAS_ACAO} items-center gap-0 bg-bg3 px-3 py-1.5 text-[8px] font-bold uppercase tracking-wide text-t3`}>
+                  <div
+                    className={`grid ${COLUNAS_ACAO} items-center gap-0 bg-bg3 px-3 py-1.5 text-[8px] font-bold uppercase tracking-wide text-t3`}
+                  >
                     <div>ID AÇÃO</div>
+                    {false ? <div>REQUISITO</div> : null}
                     <div>ITEM</div>
                     <div>AÇÃO</div>
                     <div>UNIDADE</div>
@@ -715,6 +833,7 @@ export function AcoesTable({
                       podeEditar={podeEditar}
                       podeAuditar={podeAuditar}
                       podeEnviar={podeEnviar}
+                      mostrarRequisito={false}
                       onEditar={onEditar}
                       onRemover={onRemover}
                       onAprovar={onAprovar}

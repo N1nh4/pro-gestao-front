@@ -43,6 +43,24 @@ const NIVEL_COR: Record<string, string> = {
 };
 
 const NIVEIS: NivelItem[] = ["I", "II", "III", "IV"];
+const ORDEM_NIVEL: Record<string, number> = {
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+};
+
+function compararCodigosRequisito(a: string, b: string): number {
+  const partesA = a.split(".").map(Number);
+  const partesB = b.split(".").map(Number);
+
+  for (let indice = 0; indice < Math.min(partesA.length, partesB.length); indice += 1) {
+    const diferenca = partesA[indice] - partesB[indice];
+    if (diferenca !== 0) return diferenca;
+  }
+
+  return partesA.length - partesB.length;
+}
 
 const campo =
   "w-full rounded border border-brd2 bg-bg2 px-2.5 py-[6px] text-[11px] text-t1 placeholder:text-t4 focus:outline-none";
@@ -82,9 +100,18 @@ export function ManualDetalhe({ idManual }: { idManual: number }) {
   const [erro, setErro] = useState<string | null>(null);
 
   const listaManuais = manuais.data;
-  const listaReqs = [...requisitos.data].sort((a, b) => b.id_requisito - a.id_requisito);
+  const listaReqs = [...requisitos.data].sort(
+    (a, b) =>
+      compararCodigosRequisito(a.cod_requisito, b.cod_requisito) ||
+      b.id_requisito - a.id_requisito,
+  );
   const listaDims = dimensoes.data;
-  const listaItens = [...itens.data].sort((a, b) => b.id_item - a.id_item);
+  const listaItens = [...itens.data].sort(
+    (a, b) =>
+      (ORDEM_NIVEL[a.nivel] ?? Number.MAX_SAFE_INTEGER) -
+        (ORDEM_NIVEL[b.nivel] ?? Number.MAX_SAFE_INTEGER) ||
+      b.id_item - a.id_item,
+  );
 
   const manual = listaManuais.find((m) => m.id_manual === idManual);
   const carregando =

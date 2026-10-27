@@ -42,8 +42,8 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
 
   return (
     <header className="flex h-[51px] shrink-0 items-center gap-2 border-b border-brd bg-bg1 px-4">
-      <div className="flex-1 text-[13px] font-bold text-t1">{title}</div>
-
+      {/* removi o title */}{" "}
+      <div className="flex-1 text-[13px] font-bold text-t1"></div>
       <div className="flex gap-0.5 rounded border border-brd2 bg-bg2 p-0.5">
         <button
           type="button"
@@ -66,7 +66,6 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
           <Sun className="size-3" /> Claro
         </button>
       </div>
-
       <button
         type="button"
         onClick={openNotifications}
@@ -78,7 +77,6 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
           5
         </span>
       </button>
-
       {perfil ? (
         <div ref={cardRef} className="relative">
           <button
@@ -90,8 +88,12 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
               {initials(perfil.nome)}
             </span>
             <span className="text-left leading-tight">
-              <span className="block text-[10px] font-semibold text-t1">{perfil.nome}</span>
-              <span className="block text-[9px] text-t3">{perfil.setor ?? perfil.label}</span>
+              <span className="block text-[10px] font-semibold text-t1">
+                {perfil.nome}
+              </span>
+              <span className="block text-[9px] text-t3">
+                {perfil.setor ?? perfil.label}
+              </span>
             </span>
             <ChevronDown className="size-3 text-t3" />
           </button>
@@ -99,7 +101,9 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
           {userOpen ? (
             <div className="animate-fade-in absolute right-0 top-[calc(100%+6px)] z-50 w-60 rounded-md border border-brd bg-bg1 p-0 shadow-xl shadow-black/40">
               <div className="border-b border-brd px-3 py-2">
-                <div className="text-[11px] font-bold text-t1">{perfil.nome}</div>
+                <div className="text-[11px] font-bold text-t1">
+                  {perfil.nome}
+                </div>
                 <div className="text-[9px] text-t3">{perfil.email}</div>
               </div>
               <div className="p-2 text-[10px]">
@@ -112,13 +116,13 @@ export function Topbar({ title, primaryLabel }: TopbarProps) {
           ) : null}
         </div>
       ) : null}
-
       {primaryLabel ? (
         <Button
           variant="pri"
           icon={<Plus className="size-3.5" />}
           onClick={() => {
-            if (!runPrimaryAction()) toast(`${primaryLabel} — em breve.`, "info");
+            if (!runPrimaryAction())
+              toast(`${primaryLabel} — em breve.`, "info");
           }}
         >
           {primaryLabel}

@@ -26,7 +26,11 @@ function formatarData(data: string | null) {
   const parsed = new Date(`${data}T12:00:00`);
   return Number.isNaN(parsed.getTime())
     ? data
-    : parsed.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+    : parsed.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
 }
 
 export default function CertificacaoPage() {
@@ -35,7 +39,9 @@ export default function CertificacaoPage() {
   const router = useRouter();
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState<AuditoriaDto | null>(null);
-  const [auditoriaRecemCriada, setAuditoriaRecemCriada] = useState<string | null>(null);
+  const [auditoriaRecemCriada, setAuditoriaRecemCriada] = useState<
+    string | null
+  >(null);
   const auditoriasResource = useApiResource<AuditoriaDto[]>(
     "auditorias-historico",
     () => listarAuditorias(),
@@ -46,7 +52,11 @@ export default function CertificacaoPage() {
     listarCertificacoes,
     [],
   );
-  const manuaisResource = useApiResource("manuais-auditoria", listarManuais, []);
+  const manuaisResource = useApiResource(
+    "manuais-auditoria",
+    listarManuais,
+    [],
+  );
   const niveisResource = useApiResource("niveis-auditoria", listarNiveis, []);
   const isAdmin = perfil?.id === "ag" || perfil?.id === "sa";
   const auditorias = auditoriasResource.data;
@@ -92,7 +102,12 @@ export default function CertificacaoPage() {
       auditoriasResource.reload();
       toast("Auditoria removida", "ok");
     } catch (error) {
-      toast(error instanceof Error ? error.message : "Não foi possível remover a auditoria", "err");
+      toast(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível remover a auditoria",
+        "err",
+      );
     }
   }
 
@@ -104,18 +119,27 @@ export default function CertificacaoPage() {
         : (Date.parse(b.criado_em ?? "") || Date.parse(b.data_auditoria)) -
           (Date.parse(a.criado_em ?? "") || Date.parse(a.data_auditoria)),
   );
-  const aprovadas = auditorias.filter((auditoria) => auditoria.conclusao === "aprovado").length;
-  const pendentes = auditorias.filter((auditoria) => auditoria.conclusao === "pendente").length;
+  const aprovadas = auditorias.filter(
+    (auditoria) => auditoria.conclusao === "aprovado",
+  ).length;
+  const pendentes = auditorias.filter(
+    (auditoria) => auditoria.conclusao === "pendente",
+  ).length;
 
   return (
     <div className="animate-fade-in">
       {auditoriasResource.offline ? (
         <Alert variant="warn" title="API indisponível" className="mb-2">
-          {auditoriasResource.error ?? "Não foi possível carregar as auditorias."}
+          {auditoriasResource.error ??
+            "Não foi possível carregar as auditorias."}
         </Alert>
       ) : null}
       {isAdmin && certificacoesResource.offline ? (
-        <Alert variant="warn" title="Certificações indisponíveis" className="mb-2">
+        <Alert
+          variant="warn"
+          title="Certificações indisponíveis"
+          className="mb-2"
+        >
           Não foi possível carregar as certificações para cadastrar auditorias.
         </Alert>
       ) : null}
@@ -126,21 +150,28 @@ export default function CertificacaoPage() {
       ) : null}
 
       <Alert variant="info" title="Auditorias">
-        Consulte as auditorias registradas e abra uma auditoria para acompanhar o plano de ação.
+        Consulte as auditorias registradas e abra uma auditoria para acompanhar
+        o plano de ação.
       </Alert>
 
       <div className="mb-2.5 mt-2 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <div className="rounded-md border border-brd bg-bg1 p-3">
           <div className="text-[10px] text-t3">Total registradas</div>
-          <div className="mt-1 text-xl font-extrabold leading-none text-prp2">{auditorias.length}</div>
+          <div className="mt-1 text-xl font-extrabold leading-none text-prp2">
+            {auditorias.length}
+          </div>
         </div>
         <div className="rounded-md border border-brd bg-bg1 p-3">
           <div className="text-[10px] text-t3">Aprovadas</div>
-          <div className="mt-1 text-xl font-extrabold leading-none text-grn2">{aprovadas}</div>
+          <div className="mt-1 text-xl font-extrabold leading-none text-grn2">
+            {aprovadas}
+          </div>
         </div>
         <div className="rounded-md border border-brd bg-bg1 p-3">
           <div className="text-[10px] text-t3">Pendentes</div>
-          <div className="mt-1 text-xl font-extrabold leading-none text-amb2">{pendentes}</div>
+          <div className="mt-1 text-xl font-extrabold leading-none text-amb2">
+            {pendentes}
+          </div>
         </div>
         <div className="rounded-md border border-brd bg-bg1 p-3">
           <div className="text-[10px] text-t3">Última auditoria</div>
@@ -154,7 +185,9 @@ export default function CertificacaoPage() {
       </div>
 
       {auditoriasResource.loading ? (
-        <div className="py-10 text-center text-[11px] text-t3">Carregando auditorias…</div>
+        <div className="py-10 text-center text-[11px] text-t3">
+          Carregando auditorias…
+        </div>
       ) : ordenadas.length ? (
         <div className="flex flex-col gap-2">
           {ordenadas.map((auditoria) => (
@@ -186,7 +219,9 @@ export default function CertificacaoPage() {
                   · {auditoria.nome_manual} · v{auditoria.versao_manual}
                 </span>
                 <span>· {rotulo(auditoria.modalidade)}</span>
-                <span>· {auditoria.auditor_nome || "Auditor não informado"}</span>
+                <span>
+                  · {auditoria.auditor_nome || "Auditor não informado"}
+                </span>
                 <span>
                   · {auditoria.acoes_count}{" "}
                   {auditoria.acoes_count === 1 ? "ação" : "ações"}

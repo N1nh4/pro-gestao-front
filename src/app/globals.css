@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Design tokens — portados do SPA original (sac-progestao-demo.html)
-   Tema padrão: escuro. Tema claro via [data-theme="light"].
+   Design tokens �?" portados do SPA original (sac-progestao-demo.html)
+   Tema padrǜo: escuro. Tema claro via [data-theme="light"].
    ========================================================================== */
+html {
+  font-size: 100%;
+  zoom: 1;
+}
+
 :root {
   --bg0: #0a0e16;
   --bg1: #10141d;

@@ -4,12 +4,13 @@
    ========================================================================== */
 
 export const TIPO_OPCOES = [
-  { valor: "auditoria_inicial", rotulo: "Auditoria Inicial" },
+  // { valor: "auditoria_inicial", rotulo: "Auditoria Inicial" },
   { valor: "pre_auditoria", rotulo: "Pré-Auditoria" },
-  { valor: "supervisao_documental", rotulo: "Supervisão Documental" },
-  { valor: "supervisao_presencial", rotulo: "Supervisão Presencial" },
-  { valor: "renovacao", rotulo: "Renovação" },
-  { valor: "mudanca_nivel", rotulo: "Mudança de Nível" },
+  { valor: "auditoria_certificacao", rotulo: "Auditoria de Certificação" },
+  { valor: "supervisao_documental", rotulo: "Primeira Supervisão" },
+  { valor: "supervisao_presencial", rotulo: "Segunda Supervisão" },
+  // { valor: "renovacao", rotulo: "Renovação" },
+  // { valor: "mudanca_nivel", rotulo: "Mudança de Nível" },
 ] as const;
 
 export const MODALIDADE_OPCOES = [
@@ -27,17 +28,24 @@ export const CONCLUSAO_OPCOES = [
 ] as const;
 
 const ROTULOS = new Map<string, string>(
-  [...TIPO_OPCOES, ...MODALIDADE_OPCOES, ...CONCLUSAO_OPCOES].map((o) => [o.valor, o.rotulo]),
+  [...TIPO_OPCOES, ...MODALIDADE_OPCOES, ...CONCLUSAO_OPCOES].map((o) => [
+    o.valor,
+    o.rotulo,
+  ]),
 );
 
-export function rotulo(valor: string | null | undefined, fallback = "—"): string {
+export function rotulo(
+  valor: string | null | undefined,
+  fallback = "—",
+): string {
   if (!valor) return fallback;
   return ROTULOS.get(valor) ?? valor;
 }
 
 export const TIPO_COR: Record<string, string> = {
-  auditoria_inicial: "var(--org2)",
+  // auditoria_inicial: "var(--org2)",
   pre_auditoria: "var(--acc2)",
+  auditoria_certificacao: "var(--org2)",
   supervisao_documental: "var(--prp2)",
   supervisao_presencial: "var(--grn2)",
   renovacao: "var(--amb2)",
